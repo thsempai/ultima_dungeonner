@@ -66,14 +66,13 @@ class DBConnection:
         sql += 'inner join object on rob_obj_xid = obj_id '
         sql += 'where rob_roo_xid = ' + str(room_id)
 
-        data = db.__getCursor(sql)
+        cursor = db.__getCursor(sql)
         data = cursor.fetchall()
 
         for obj in data:
-            pos = obj[1],obj[2]
+            pos = int(obj[1]),int(obj[2])
             name = obj[0]
 
             room['objects'][pos] = name
-
         return room
 

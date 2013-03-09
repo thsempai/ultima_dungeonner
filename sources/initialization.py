@@ -78,12 +78,12 @@ def loadObjects():
 
     for obj in rows:
         name = obj[0]
-        region = obj[2], obj[3], TILE_SIZE[0], TILE_SIZE[1]
+        region = obj[2] * TILE_SIZE[0], obj[3] * TILE_SIZE[0], TILE_SIZE[0], TILE_SIZE[1]
         path = obj[1]
 
         img = ServerConnection.getImage(path,region)
 
-        dic['name'] = img
+        dic[name] = img
 
     global OBJECTS
     OBJECTS.update(dic)

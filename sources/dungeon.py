@@ -35,10 +35,10 @@ class RoomScene(cocos.scene.Scene):
         entry = int(self.size[0]/2),0
 
         room_dict = DBConnection.getRoom(room_id)
-        
+
         self.layer =    {
                         "room" : RoomLayer(room_dict['tileset'],self.size),
-                        "item" : ItemLayer(),
+                        "item" : ItemLayer(room_dict['objects']),
                         "grid" : GridLayer(TILE_SIZE,self.size),
                         "character" : CharacterLayer(hero_image,entry)
                         }
@@ -135,10 +135,19 @@ class GridLayer(cocos.layer.Layer):
 
 class ItemLayer(cocos.layer.Layer):
 
-    def __init__(self):
+    def __init__(self,obj_dict):
         
         cocos.layer.Layer.__init__(self)
+        self.__obj_dict = {}
 
+        for pos,name in obj_dict.items():
+
+            img = OBJECTS[name]
+            sp = Sprite(img,pos)
+
+            self.__obj_dict[pos] = sp
+            self.add(sp)
+            print sp.position
 
 class CharacterLayer(cocos.layer.Layer):
 
