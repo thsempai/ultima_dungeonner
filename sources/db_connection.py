@@ -51,7 +51,8 @@ class DBConnection:
         room =  {
                 'name' :    None,
                 'tileset' : None,
-                'objects': {}
+                'objects': {},
+                'enemies': {}
                 }
 
         cursor = db.__getCursor(sql)
@@ -74,5 +75,20 @@ class DBConnection:
             name = obj[0]
 
             room['objects'][pos] = name
+
+        sql  = 'select ene_name, ren_x, ren_y, ren_ene_lvl '
+        sql += 'from room_enemy '
+        sql += 'inner join enemy on ren_ene_xid = ene_id '
+        sql += 'where ren_roo_xid = ' + str(room_id)
+
+        cursor = db.__getCursor(sql)
+        data = cursor.fetchall()
+
+        for ene in data:
+            pos = ene[1],ene[2]
+            enemy = ene[0],ene[3]
+
+            room['enemies'][pos] = enemy
+
         return room
 

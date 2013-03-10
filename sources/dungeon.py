@@ -6,6 +6,7 @@ from db_connection import DBConnection
 
 TILESETS = {}
 OBJECTS = {}
+ENEMIES = {}
 
 TILE_SIZE = 32,32
 
@@ -16,7 +17,7 @@ class Dungeon(list):
     def __init__(self,hero):
         self.hero = hero
         #uniquement pour les tests
-        self.append(RoomScene(2,self.hero.image))
+        self.append(RoomScene(3,self.hero.image))
 
     def __repr__(self):
 
@@ -42,7 +43,7 @@ class RoomScene(cocos.scene.Scene):
                         "room" : RoomLayer(room_dict['tileset'],self.size),
                         "item" : ItemLayer(room_dict['objects']),
                         "grid" : GridLayer(TILE_SIZE,self.size),
-                        "character" : CharacterLayer(hero_image,entry)
+                        "character" : CharacterLayer(hero_image,entry,room_dict['enemies'])
                         }
         z = {
             "room" : 0,
@@ -152,13 +153,28 @@ class ItemLayer(cocos.layer.Layer):
 
 class CharacterLayer(cocos.layer.Layer):
 
-    def __init__(self, hero_image, hero_initial_position):
+    def __init__(self, hero_image, hero_initial_position, ene_dict):
         cocos.layer.Layer.__init__(self)
 
-        self.hero_tile_position = hero_initial_position
         self.__hero_sprite = Sprite(hero_image,hero_initial_position,anchor=(0,TILE_SIZE[1]/-6))
         
         self.add(self.__hero_sprite)
+
+        self.__ene_dict = {}
+
+        for pos,enemy in ene_dict.items():
+            name = enemy[0]
+            lvl = enemy[1]
+
+            ene = Enemy(name,lvl,pos)
+
+            self.__ene_dict[pos] = ene
+            self.add(ene)
+
+    def getHeroposition(self):
+
+        return self.__hero_sprite.room_position
+
 
 class Sprite(cocos.sprite.Sprite):
 
@@ -197,4 +213,20 @@ class Sprite(cocos.sprite.Sprite):
     room_position = property(**room_position())
 
     
+class Enemy(Sprite):
 
+    def __init__(self,name,lvl,room_position):
+
+        img = ENEMIES[name]
+        anchor = (0,TILE_SIZE[1]/-6)
+
+        self.__name = name
+        self.__lvl = lvl
+
+        Sprite.__init__(self,img,room_position,anchor)
+
+        print self
+
+    def __repr__(self):
+
+        return self.__name + ' ( lvl ' + str(self.__lvl) + ')'
