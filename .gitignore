@@ -40,3 +40,7 @@ nosetests.xml
 #sublim text
 
 *.sublime-*
+
+#mysql-workbench
+
+*.mwb.bak
