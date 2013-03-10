@@ -44,6 +44,11 @@ insert into
         'trap',
         'img/tileset/object.png',
         'item'
+        ),
+        (
+        'imp',
+        'img/tileset/imp.png',
+        'enemy'
         );
 
 commit;
@@ -67,6 +72,15 @@ from
     tileset
 where
     til_name = 'room';
+
+select 
+    til_id
+into
+    @tileset_imp_id
+from
+    tileset
+where
+    til_name = 'imp';
 
 
 -- insert object
@@ -99,6 +113,38 @@ from
     object
 where
     obj_name = 'poison trap';
+
+
+-- insert des enemy
+
+insert
+    enemy
+        (
+        ene_name,
+        ene_til_xid,
+        ene_til_x,
+        ene_til_y
+        )
+    values
+        (
+        'imp',
+        @tileset_imp_id,
+        0,
+        0
+        );
+
+commit;
+
+-- récupération des objects
+
+select 
+    ene_id
+into
+    @imp_id
+from
+    enemy
+where
+    ene_name = 'imp';
 
 
 -- insert room
@@ -154,6 +200,40 @@ insert into
         @poison_trap_id,
         5,
         10
+        );
+
+-- insert des enemy dans la pièce.
+
+insert into
+    room_enemy
+        (
+        ren_roo_xid,
+        ren_ene_xid,
+        ren_x,
+        ren_y,
+        ren_ene_lvl
+        )
+    values
+        (
+        @room_id,
+        @imp_id,
+        3,
+        3,
+        1
+        ),
+        (
+        @room_id,
+        @imp_id,
+        10,
+        10,
+        1
+        ),
+        (
+        @room_id,
+        @imp_id,
+        5,
+        2,
+        1
         );
 
 commit;

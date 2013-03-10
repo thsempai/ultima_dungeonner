@@ -16,6 +16,7 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`dungeon` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
+
 -- -----------------------------------------------------
 -- Table `1gam201302`.`tileset`
 -- -----------------------------------------------------
@@ -24,9 +25,9 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`tileset` (
   `til_name` VARCHAR(45) NOT NULL ,
   `til_path` VARCHAR(100) NOT NULL ,
   `til_type` VARCHAR(100) NOT NULL ,
-  PRIMARY KEY (`til_id`))
+  PRIMARY KEY (`til_id`) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 3
+AUTO_INCREMENT = 5
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -47,7 +48,7 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`object` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 3
+AUTO_INCREMENT = 4
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -61,7 +62,7 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`user` (
   PRIMARY KEY (`use_id`) ,
   UNIQUE INDEX `ndx_use_name` (`use_nickname` ASC) )
 ENGINE = InnoDB
-AUTO_INCREMENT = 5
+AUTO_INCREMENT = 6
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -74,9 +75,9 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`room` (
   `roo_use_xid` INT(11) NOT NULL ,
   `roo_til_xid` INT(11) NOT NULL ,
   PRIMARY KEY (`roo_id`) ,
+  UNIQUE INDEX `ndx_roo_name` (`roo_name` ASC) ,
   INDEX `fk_user_fk1` (`roo_use_xid` ASC) ,
   INDEX `fk_tileset_fk1` (`roo_til_xid` ASC) ,
-  UNIQUE INDEX `ndx_roo_name` (`roo_name` ASC) ,
   CONSTRAINT `fk_tileset_fk1`
     FOREIGN KEY (`roo_til_xid` )
     REFERENCES `1gam201302`.`tileset` (`til_id` )
@@ -88,7 +89,7 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`room` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
-AUTO_INCREMENT = 2
+AUTO_INCREMENT = 3
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -134,6 +135,52 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`room_object` (
   CONSTRAINT `fk_room_fk`
     FOREIGN KEY (`rob_roo_xid` )
     REFERENCES `1gam201302`.`room` (`roo_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `1gam201302`.`enemy`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `1gam201302`.`enemy` (
+  `ene_id` INT NOT NULL ,
+  `ene_name` VARCHAR(45) NOT NULL ,
+  `ene_til_xid` INT(11) NOT NULL ,
+  `ene_til_x` INT NOT NULL ,
+  `ene_til_y` INT NOT NULL ,
+  PRIMARY KEY (`ene_id`) ,
+  UNIQUE INDEX `ene_name_UNIQUE` (`ene_name` ASC) ,
+  INDEX `fk_tileset_fk2` (`ene_til_xid` ASC) ,
+  CONSTRAINT `fk_tileset_fk2`
+    FOREIGN KEY (`ene_til_xid` )
+    REFERENCES `1gam201302`.`tileset` (`til_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `1gam201302`.`room_enemy`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `1gam201302`.`room_enemy` (
+  `ren_roo_xid` INT NOT NULL ,
+  `ren_x` INT NOT NULL ,
+  `ren_y` INT NOT NULL ,
+  `ren_ene_xid` INT NOT NULL ,
+  `ren_ene_lvl` INT NOT NULL ,
+  PRIMARY KEY (`ren_roo_xid`, `ren_x`, `ren_y`) ,
+  INDEX `fk_room_fk2` (`ren_roo_xid` ASC) ,
+  INDEX `fk_enemy_fk1` (`ren_ene_xid` ASC) ,
+  CONSTRAINT `fk_room_fk2`
+    FOREIGN KEY (`ren_roo_xid` )
+    REFERENCES `1gam201302`.`room` (`roo_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_enemy_fk1`
+    FOREIGN KEY (`ren_ene_xid` )
+    REFERENCES `1gam201302`.`enemy` (`ene_id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
