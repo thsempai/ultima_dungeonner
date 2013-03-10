@@ -55,9 +55,6 @@ def loadTileset():
                 prop =  {   'passable': True
                         }
 
-                if n[:4] == 'wall':
-                    prop['passable'] = False
-
                 tileset.add( prop, getTile(img,p), n)
                 dic[name] = tileset
         else:
