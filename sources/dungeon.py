@@ -3,13 +3,13 @@ import cocos
 import random
 
 from db_connection import DBConnection
+from controler_manager import CONTROLER
 
 TILESETS = {}
 OBJECTS = {}
 ENEMIES = {}
 
 TILE_SIZE = 32,32
-
 
 
 class Dungeon(list):
@@ -19,9 +19,31 @@ class Dungeon(list):
         #uniquement pour les tests
         self.append(RoomScene(3,self.hero.image))
 
+        self.__active_room = None
+
+        self.changeRoom(0)
+
+
     def __repr__(self):
 
         return "Class Dungeon"
+
+    def __mappingAction(self):
+
+        room = self.__active_room
+
+        CONTROLER.defineCommand('dungeon','hero_up',room.moveHero,[(0,1)])
+        CONTROLER.defineCommand('dungeon','hero_down',room.moveHero,[(0,-1)])
+        CONTROLER.defineCommand('dungeon','hero_left',room.moveHero,[(-1,0)])
+        CONTROLER.defineCommand('dungeon','hero_right',room.moveHero,[(1,0)])
+
+    def changeRoom(self,index):
+
+        self.__active_room = self[0]
+        self.__mappingAction()
+
+    def on_key_release(self,symbol, modifiers):
+        CONTROLER.onKeyRelease('dungeon',symbol,modifiers)
 
 
 class RoomScene(cocos.scene.Scene):
@@ -59,6 +81,14 @@ class RoomScene(cocos.scene.Scene):
     def __repr__(self):
 
         return "RoomScene '" + self.__name +"'"
+
+    def moveHero(self,move):
+        x,y =  self.layer['character'].getHeroPosition()
+        x,y =  x +  move[0], y + move[1]
+
+        if self.layer['room'].isPassable((x,y)):
+            self.layer['character'].moveHero(move)
+
 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
@@ -118,6 +148,27 @@ class RoomLayer(cocos.tiles.RectMapLayer):
             for y in range(self.size[1]+2):
                 self.cells[x][y] = cocos.tiles.RectCell(x,y,TILE_SIZE[0],TILE_SIZE[1],{},self.tileset[self.cells[x][y]])
 
+    def _isValid(self,position):
+
+        x,y = position
+
+        if x < 0 or x >= self.size[0]:
+            return False
+
+        if y < 0 or y >= self.size[1]:
+            return False
+
+        return True
+
+    def isPassable(self, position):
+        x,y = position
+        
+        if self._isValid(position):
+            return self.get_cell(x,y)['passable']
+
+        return False
+
+
 class GridLayer(cocos.layer.Layer):
 
     def __init__(self,tilesize,size):
@@ -135,7 +186,6 @@ class GridLayer(cocos.layer.Layer):
             self.add(line)
 
 
-
 class ItemLayer(cocos.layer.Layer):
 
     def __init__(self,obj_dict):
@@ -151,9 +201,11 @@ class ItemLayer(cocos.layer.Layer):
             self.__obj_dict[pos] = sp
             self.add(sp)
 
+
 class CharacterLayer(cocos.layer.Layer):
 
     def __init__(self, hero_image, hero_initial_position, ene_dict):
+
         cocos.layer.Layer.__init__(self)
 
         self.__hero_sprite = Sprite(hero_image,hero_initial_position,anchor=(0,TILE_SIZE[1]/-6))
@@ -171,10 +223,12 @@ class CharacterLayer(cocos.layer.Layer):
             self.__ene_dict[pos] = ene
             self.add(ene)
 
-    def getHeroposition(self):
+    def getHeroPosition(self):
 
         return self.__hero_sprite.room_position
 
+    def moveHero(self,move):
+        self.__hero_sprite.do(MoveTile(move))
 
 class Sprite(cocos.sprite.Sprite):
 
@@ -225,8 +279,25 @@ class Enemy(Sprite):
 
         Sprite.__init__(self,img,room_position,anchor)
 
-        print self
 
     def __repr__(self):
 
-        return self.__name + ' ( lvl ' + str(self.__lvl) + ')'
+        return self.__name + ' (lvl ' + str(self.__lvl) + ')'
+
+
+class MoveTile(cocos.actions.interval_actions.MoveBy):
+
+    def __init__(self,(dx,dy)):
+        delta = dx*TILE_SIZE[0], dy*TILE_SIZE[1]
+        duration = 1
+
+        cocos.actions.interval_actions.MoveBy.__init__(self,delta,duration)
+
+    def start(self):
+        cocos.actions.interval_actions.MoveBy.start(self)
+        CONTROLER.pause = True
+
+    def stop(self):
+        cocos.actions.interval_actions.MoveBy.stop(self)
+        CONTROLER.pause = False
+
