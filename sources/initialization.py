@@ -18,9 +18,8 @@ def loadTileset():
 
     dic = {}
 
-    sql =  "select til_name, til_path, tty_name "
+    sql =  "select til_name, til_path, til_type "
     sql += "from tileset "
-    sql += "inner join tileset_type on til_tty_xid = tty_id "
 
     rows = DBConnection.getResult(sql)
 

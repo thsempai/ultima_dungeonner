@@ -16,7 +16,7 @@ class Dungeon(list):
     def __init__(self,hero):
         self.hero = hero
         #uniquement pour les tests
-        self.append(RoomScene(1,self.hero.image))
+        self.append(RoomScene(2,self.hero.image))
 
     def __repr__(self):
 
@@ -35,6 +35,8 @@ class RoomScene(cocos.scene.Scene):
         entry = int(self.size[0]/2),0
 
         room_dict = DBConnection.getRoom(room_id)
+
+        self.__name = room_dict['name']
 
         self.layer =    {
                         "room" : RoomLayer(room_dict['tileset'],self.size),
@@ -55,7 +57,7 @@ class RoomScene(cocos.scene.Scene):
 
     def __repr__(self):
 
-        return "Class RoomScene"
+        return "RoomScene '" + self.__name +"'"
 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
@@ -147,7 +149,6 @@ class ItemLayer(cocos.layer.Layer):
 
             self.__obj_dict[pos] = sp
             self.add(sp)
-            print sp.position
 
 class CharacterLayer(cocos.layer.Layer):
 

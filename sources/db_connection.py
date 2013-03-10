@@ -70,7 +70,7 @@ class DBConnection:
         data = cursor.fetchall()
 
         for obj in data:
-            pos = int(obj[1]),int(obj[2])
+            pos = obj[1],obj[2]
             name = obj[0]
 
             room['objects'][pos] = name
