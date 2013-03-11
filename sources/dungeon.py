@@ -61,6 +61,8 @@ class RoomScene(cocos.scene.Scene):
 
         self.__name = room_dict['name']
 
+        self.__events_queue = []
+
         self.layer =    {
                         "room" : RoomLayer(room_dict['tileset'],self.size),
                         "item" : ItemLayer(room_dict['objects']),
@@ -77,18 +79,49 @@ class RoomScene(cocos.scene.Scene):
         for key, value in self.layer.items():
             self.add(value,z=z[key])
 
+        self.schedule(self.__callback)
+
+
+    def __addEvent(self,event):
+        self.__events_queue.append(event) 
 
     def __repr__(self):
 
         return "RoomScene '" + self.__name +"'"
 
     def moveHero(self,move):
+        CONTROLER.pause = True
         x,y =  self.layer['character'].getHeroPosition()
         x,y =  x +  move[0], y + move[1]
 
         if self.layer['room'].isPassable((x,y)):
-            self.layer['character'].moveHero(move)
 
+            enemy =  self.layer['character'].getEnemy((x,y))
+
+            if enemy != None:
+                
+                event = {
+                        'type':'hero-attack',
+                        'target': enemy
+                        }
+
+                self.__addEvent(event)
+            else:
+                self.layer['character'].moveHero(move)
+
+    def __solveEvents(self):
+        for event in self.__events_queue:
+            if event['type'] == 'hero-attack':
+                print 'Here attacks ' + str(event['target'])
+
+        self.__events_queue = []
+
+    def __callback(self,dt):
+        
+        if not self.layer['character'].onAnimation():
+            CONTROLER.pause = False
+            if len(self.__events_queue) > 0:
+                self.__solveEvents()
 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
@@ -223,12 +256,31 @@ class CharacterLayer(cocos.layer.Layer):
             self.__ene_dict[pos] = ene
             self.add(ene)
 
+    
+    def onAnimation(self):
+        if self.__hero_sprite.are_actions_running():
+            return True
+
+        for enemy in self.__ene_dict.values():
+            if enemy.are_actions_running():
+                return True
+
+        return False
+
     def getHeroPosition(self):
 
         return self.__hero_sprite.room_position
 
-    def moveHero(self,move):
-        self.__hero_sprite.do(MoveTile(move))
+    def getEnemy(self, position):
+
+        if position in self.__ene_dict:
+            return self.__ene_dict[position]
+
+        return None
+
+    def moveHero(self, move):
+
+        self.__hero_sprite.move(move)
 
 class Sprite(cocos.sprite.Sprite):
 
@@ -266,6 +318,9 @@ class Sprite(cocos.sprite.Sprite):
 
     room_position = property(**room_position())
 
+    def move(self,move):
+        self.do(MoveTile(move))
+
     
 class Enemy(Sprite):
 
@@ -289,15 +344,6 @@ class MoveTile(cocos.actions.interval_actions.MoveBy):
 
     def __init__(self,(dx,dy)):
         delta = dx*TILE_SIZE[0], dy*TILE_SIZE[1]
-        duration = 1
+        duration = 0.5
 
         cocos.actions.interval_actions.MoveBy.__init__(self,delta,duration)
-
-    def start(self):
-        cocos.actions.interval_actions.MoveBy.start(self)
-        CONTROLER.pause = True
-
-    def stop(self):
-        cocos.actions.interval_actions.MoveBy.stop(self)
-        CONTROLER.pause = False
-
