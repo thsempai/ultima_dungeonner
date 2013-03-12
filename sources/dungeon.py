@@ -67,13 +67,15 @@ class RoomScene(cocos.scene.Scene):
                         "room" : RoomLayer(room_dict['tileset'],self.size),
                         "item" : ItemLayer(room_dict['objects']),
                         "grid" : GridLayer(TILE_SIZE,self.size),
-                        "character" : CharacterLayer(hero_image,entry,room_dict['enemies'])
+                        "character" : CharacterLayer(hero_image,entry,room_dict['enemies']),
+                        "gui" : GUILayer()
                         }
         z = {
             "room" : 0,
             "grid" : 1,
             "item" : 2,
-            "character" : 3
+            "character" : 3,
+            "gui" : 4
             }
 
         for key, value in self.layer.items():
@@ -112,7 +114,9 @@ class RoomScene(cocos.scene.Scene):
     def __solveEvents(self):
         for event in self.__events_queue:
             if event['type'] == 'hero-attack':
-                print 'Here attacks ' + str(event['target'])
+
+                msg = 'Hero attacks ' + str(event['target'])
+                self.layer['gui'].addMessage(msg)
 
         self.__events_queue = []
 
@@ -200,6 +204,34 @@ class RoomLayer(cocos.tiles.RectMapLayer):
             return self.get_cell(x,y)['passable']
 
         return False
+
+class GUILayer(cocos.layer.Layer):
+
+    def __init__(self):
+        cocos.layer.Layer.__init__(self)
+
+        self.__messages = []
+        self.__labels = []
+
+        x = 500
+        y = 120
+        dy = 20 
+
+        for n in range(5):
+            pos = x,y
+            self.__labels.append(cocos.text.Label(position=pos))
+            self.add(self.__labels[-1])
+            y -= dy
+
+    def addMessage(self, message):
+
+        self.__messages.insert(0,message)
+        self.__updateLabel()
+
+    def __updateLabel(self):
+        
+        for index in range(min(5,len(self.__messages))):
+            self.__labels[index].element.text = self.__messages[index]
 
 
 class GridLayer(cocos.layer.Layer):
