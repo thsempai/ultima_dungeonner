@@ -108,6 +108,12 @@ class RoomScene(cocos.scene.Scene):
                         }
 
                 self.__addEvent(event)
+
+                msg = 'Hero attacks ' + str(event['target'])
+                self.layer['gui'].addMessage(msg)
+
+                self.layer['character'].heroAttack(move)
+
             else:
                 self.layer['character'].moveHero(move)
 
@@ -115,7 +121,7 @@ class RoomScene(cocos.scene.Scene):
         for event in self.__events_queue:
             if event['type'] == 'hero-attack':
 
-                msg = 'Hero attacks ' + str(event['target'])
+                msg = 'Hero hurts ' + str(event['target'])
                 self.layer['gui'].addMessage(msg)
 
         self.__events_queue = []
@@ -314,6 +320,11 @@ class CharacterLayer(cocos.layer.Layer):
 
         self.__hero_sprite.move(move)
 
+    def heroAttack(self,direction):
+
+        self.__hero_sprite.attack(direction)
+
+
 class Sprite(cocos.sprite.Sprite):
 
     def __init__(self,image,room_position,anchor=(0,0)):
@@ -350,7 +361,16 @@ class Sprite(cocos.sprite.Sprite):
 
     room_position = property(**room_position())
 
+    def attack(self,direction):
+
+        move = direction[0]*0.5, direction[1] *0.5
+        move = MoveTile(move,duration=0.25)
+        rmove = cocos.actions.base_actions.Reverse(move)
+        self.do(move + rmove)
+
+
     def move(self,move):
+
         self.do(MoveTile(move))
 
     
@@ -374,8 +394,7 @@ class Enemy(Sprite):
 
 class MoveTile(cocos.actions.interval_actions.MoveBy):
 
-    def __init__(self,(dx,dy)):
+    def __init__(self,(dx,dy),duration=0.5):
         delta = dx*TILE_SIZE[0], dy*TILE_SIZE[1]
-        duration = 0.5
 
         cocos.actions.interval_actions.MoveBy.__init__(self,delta,duration)
