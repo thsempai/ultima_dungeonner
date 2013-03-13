@@ -63,6 +63,10 @@ class RoomScene(cocos.scene.Scene):
 
         self.__events_queue = []
 
+        self.__player_play = True
+
+        self.__enemies_queue = []
+
         self.layer =    {
                         "room" : RoomLayer(room_dict['tileset'],self.size),
                         "item" : ItemLayer(room_dict['objects']),
@@ -84,7 +88,7 @@ class RoomScene(cocos.scene.Scene):
         self.schedule(self.__callback)
 
 
-    def __addEvent(self,event):
+    def addEvent(self,event):
         self.__events_queue.append(event) 
 
     def __repr__(self):
@@ -92,7 +96,10 @@ class RoomScene(cocos.scene.Scene):
         return "RoomScene '" + self.__name +"'"
 
     def moveHero(self,move):
+
         CONTROLER.pause = True
+        self.__player_play = False
+
         x,y =  self.layer['character'].getHeroPosition()
         x,y =  x +  move[0], y + move[1]
 
@@ -107,9 +114,9 @@ class RoomScene(cocos.scene.Scene):
                         'target': enemy
                         }
 
-                self.__addEvent(event)
+                self.addEvent(event)
 
-                msg = 'Hero attacks ' + str(event['target'])
+                msg = 'Hero attacks ' + str(event['target']) + '.'
                 self.layer['gui'].addMessage(msg)
 
                 self.layer['character'].heroAttack(move)
@@ -117,21 +124,51 @@ class RoomScene(cocos.scene.Scene):
             else:
                 self.layer['character'].moveHero(move)
 
+            self.__initEnemiesTurn()
+
+
+    def __initEnemiesTurn(self):
+
+        self.__enemies_queue += self.layer['character'].getEnemies().keys()
+
+
     def __solveEvents(self):
         for event in self.__events_queue:
             if event['type'] == 'hero-attack':
 
-                msg = 'Hero hurts ' + str(event['target'])
+                msg = 'Hero hurts ' + str(event['target']) + '.'
+                self.layer['gui'].addMessage(msg)
+
+            elif event['type'] == 'enemy-attack':
+
+                msg = str(event['from']) + ' hurts Hero.'
                 self.layer['gui'].addMessage(msg)
 
         self.__events_queue = []
 
+
     def __callback(self,dt):
         
         if not self.layer['character'].onAnimation():
-            CONTROLER.pause = False
-            if len(self.__events_queue) > 0:
+
+            if self.__player_play:
+
+                CONTROLER.pause = False
                 self.__solveEvents()
+                    
+            else:
+                self.__solveEvents()
+                if(len(self.__enemies_queue)) > 0:
+                    
+                    ene_pos = self.__enemies_queue.pop(0)
+
+                    self.layer['character'].moveEnemy(ene_pos)
+
+                else:
+
+                    self.layer['character'].updateEnemiesPosition()
+                    self.__player_play = True
+
 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
@@ -211,6 +248,7 @@ class RoomLayer(cocos.tiles.RectMapLayer):
 
         return False
 
+
 class GUILayer(cocos.layer.Layer):
 
     def __init__(self):
@@ -286,6 +324,7 @@ class CharacterLayer(cocos.layer.Layer):
         self.__ene_dict = {}
 
         for pos,enemy in ene_dict.items():
+
             name = enemy[0]
             lvl = enemy[1]
 
@@ -316,13 +355,92 @@ class CharacterLayer(cocos.layer.Layer):
 
         return None
 
+    def getEnemies(self):
+
+        return self.__ene_dict
+
+
     def moveHero(self, move):
 
         self.__hero_sprite.move(move)
 
-    def heroAttack(self,direction):
+    def heroAttack(self, direction):
 
         self.__hero_sprite.attack(direction)
+
+    def updateEnemiesPosition(self):
+
+        new_dict = {}
+
+        for ene in self.__ene_dict.values():
+            new_dict[ene.room_position] =  ene
+
+        self.__ene_dict = new_dict
+
+
+    def moveEnemy(self,position):
+
+        hero_position = self.__hero_sprite.room_position
+        enemy =  self.__ene_dict[position]
+
+        ex, ey = position
+        hx, hy = hero_position
+
+        dx = 0
+        dy = 0
+
+        if (hx - ex) > 0:
+            dx = 1
+        elif (hx - ex) < 0:
+            dx = -1
+
+        if (hy - ey) > 0:
+            dy = 1
+        elif (hy - ey) < 0:
+            dy = -1
+
+        pot = []
+
+        if dx != 0:
+            pot.append((dx,0))
+
+        if dy != 0:
+            pot.append((0,dy))
+
+        l = []
+
+        for index in range(len(pot)):
+            x,y = pot[index]
+            p = ex + x, ey + y
+
+            if p == hero_position:
+                l = [index]
+                break
+
+            if p not in [t.room_position for t in self.__ene_dict.values()]:
+                l.append(index)
+
+        if len(l) == 0:
+            return
+
+        move = pot[l[random.randint(0,len(l)-1)]]
+
+        pos = ex + move[0], ey + move[1]
+
+        if pos == hero_position:
+            enemy.attack(move)
+
+            event = {
+                    'type':'enemy-attack',
+                    'from': enemy
+                    }
+
+            msg = str(enemy) + ' attacks Hero.'
+
+            self.parent.layer['gui'].addMessage(msg)
+            self.parent.addEvent(event)
+        else:
+            enemy.move(move)
 
 
 class Sprite(cocos.sprite.Sprite):
