@@ -6,3 +6,4 @@ class Hero:
     def __init__(self):
 
         self.image = ServerConnection.getImage('img/tileset/hero.png')
+        self.name = 'MySelf'

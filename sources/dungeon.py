@@ -17,7 +17,7 @@ class Dungeon(list):
     def __init__(self,hero):
         self.hero = hero
         #uniquement pour les tests
-        self.append(RoomScene(3,self.hero.image))
+        self.append(RoomScene(3,self.hero))
 
         self.__active_room = None
 
@@ -36,6 +36,7 @@ class Dungeon(list):
         CONTROLER.defineCommand('dungeon','hero_down',room.moveHero,[(0,-1)])
         CONTROLER.defineCommand('dungeon','hero_left',room.moveHero,[(-1,0)])
         CONTROLER.defineCommand('dungeon','hero_right',room.moveHero,[(1,0)])
+        CONTROLER.defineCommand('dungeon','grid_visibility',room.layer['grid'].switchVisibility)
 
     def changeRoom(self,index):
 
@@ -48,7 +49,7 @@ class Dungeon(list):
 
 class RoomScene(cocos.scene.Scene):
 
-    def __init__(self, room_id,hero_image):
+    def __init__(self, room_id,hero):
 
         cocos.scene.Scene.__init__(self)
 
@@ -58,6 +59,8 @@ class RoomScene(cocos.scene.Scene):
         entry = int(self.size[0]/2),0
 
         room_dict = DBConnection.getRoom(room_id)
+
+        self.hero = hero
 
         self.__name = room_dict['name']
 
@@ -71,7 +74,7 @@ class RoomScene(cocos.scene.Scene):
                         "room" : RoomLayer(room_dict['tileset'],self.size),
                         "item" : ItemLayer(room_dict['objects']),
                         "grid" : GridLayer(TILE_SIZE,self.size),
-                        "character" : CharacterLayer(hero_image,entry,room_dict['enemies']),
+                        "character" : CharacterLayer(hero.image,entry,room_dict['enemies']),
                         "gui" : GUILayer()
                         }
         z = {
@@ -89,6 +92,7 @@ class RoomScene(cocos.scene.Scene):
 
 
     def addEvent(self,event):
+
         self.__events_queue.append(event) 
 
     def __repr__(self):
@@ -116,7 +120,7 @@ class RoomScene(cocos.scene.Scene):
 
                 self.addEvent(event)
 
-                msg = 'Hero attacks ' + str(event['target']) + '.'
+                msg = self.hero.name + ' attacks ' + str(event['target']) + '.'
                 self.layer['gui'].addMessage(msg)
 
                 self.layer['character'].heroAttack(move)
@@ -136,12 +140,12 @@ class RoomScene(cocos.scene.Scene):
         for event in self.__events_queue:
             if event['type'] == 'hero-attack':
 
-                msg = 'Hero hurts ' + str(event['target']) + '.'
+                msg = self.hero.name + ' hurts ' + str(event['target']) + '.'
                 self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'enemy-attack':
 
-                msg = str(event['from']) + ' hurts Hero.'
+                msg = str(event['from']) + ' hurts ' + self.hero.name + '.'
                 self.layer['gui'].addMessage(msg)
 
         self.__events_queue = []
@@ -162,13 +166,20 @@ class RoomScene(cocos.scene.Scene):
                     
                     ene_pos = self.__enemies_queue.pop(0)
 
-                    self.layer['character'].moveEnemy(ene_pos)
+                    event = self.layer['character'].moveEnemy(ene_pos)
+
+                    if event != None:
+                        if event['type'] == 'enemy-attack':
+                            
+                            msg = str(event['from']) + ' attacks ' + self.hero.name + '.'
+
+                            self.layer['gui'].addMessage(msg)
+                            self.addEvent(event)
 
                 else:
 
                     self.layer['character'].updateEnemiesPosition()
                     self.__player_play = True
-
 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
@@ -259,11 +270,16 @@ class GUILayer(cocos.layer.Layer):
 
         x = 500
         y = 120
-        dy = 20 
+        dy = 20
+
 
         for n in range(5):
+            color = 100, 100, 100, 255
+            if n == 0:
+                color = 255, 255, 255, 255
+
             pos = x,y
-            self.__labels.append(cocos.text.Label(position=pos))
+            self.__labels.append(cocos.text.Label(position=pos,color=color))
             self.add(self.__labels[-1])
             y -= dy
 
@@ -284,15 +300,19 @@ class GridLayer(cocos.layer.Layer):
         
         cocos.layer.Layer.__init__(self)
 
-        color = (150,255,150,125)
+        color = (255,50,50,150)
 
-        for x in range(0,(size[0]+3)*tilesize[0],tilesize[0]):
-            line = cocos.draw.Line((x,0),(x,tilesize[1]*(size[1]+2)),color)
+        for x in range(tilesize[0],(size[0]+2)*tilesize[0],tilesize[0]):
+            line = cocos.draw.Line((x,tilesize[1]),(x,tilesize[1]*(size[1]+1)),color)
             self.add(line)
 
-        for y in range(0,(size[1]+3)*tilesize[1],tilesize[1]):
-            line = cocos.draw.Line((0,y),(tilesize[0]*(size[0]+2),y),color)
+        for y in range(tilesize[1],(size[1]+2)*tilesize[1],tilesize[1]):
+            line = cocos.draw.Line((tilesize[0],y),(tilesize[0]*(size[0]+1),y),color)
             self.add(line)
+
+    def switchVisibility(self):
+
+        self.visible = not self.visible
 
 
 class ItemLayer(cocos.layer.Layer):
@@ -434,13 +454,12 @@ class CharacterLayer(cocos.layer.Layer):
                     'type':'enemy-attack',
                     'from': enemy
                     }
+            return event
 
-            msg = str(enemy) + ' attacks Hero.'
-
-            self.parent.layer['gui'].addMessage(msg)
-            self.parent.addEvent(event)
         else:
             enemy.move(move)
+
+        return None
 
 
 class Sprite(cocos.sprite.Sprite):
