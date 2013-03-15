@@ -37,6 +37,7 @@ DEFAULT CHARACTER SET = utf8;
 CREATE  TABLE IF NOT EXISTS `1gam201302`.`object` (
   `obj_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `obj_name` VARCHAR(45) NOT NULL ,
+  `obj_type` VARCHAR(20) NOT NULL ,
   `obj_til_xid` INT(11) NOT NULL ,
   `obj_til_x` INT(11) NOT NULL ,
   `obj_til_y` INT(11) NOT NULL ,

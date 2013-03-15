@@ -42,14 +42,20 @@ insert into
         ),
         (
         'trap',
-        'img/tileset/object.png',
+        'img/tileset/traps.png',
         'item'
         ),
         (
         'imp',
         'img/tileset/imp.png',
         'enemy'
-        );
+        ),
+        (
+        'item',
+        'img/tileset/items.png',
+        'room'
+        )
+        ;
 
 commit;
 
@@ -58,11 +64,20 @@ commit;
 select 
     til_id
 into
-    @tilset_object_id
+    @tilset_trap_id
 from
     tileset
 where
     til_name = 'trap';
+
+select 
+    til_id
+into
+    @tilset_obj_id
+from
+    tileset
+where
+    til_name = 'item';
 
 select 
     til_id
@@ -89,6 +104,7 @@ insert into
     object
         (
         obj_name,
+        obj_type,
         obj_til_xid,
         obj_til_x,
         obj_til_y
@@ -96,9 +112,17 @@ insert into
     values
         (
         'poison trap',
-        @tilset_object_id,
+        'trap',
+        @tilset_trap_id,
         0,
         1
+        ),
+        (
+        'heal potion',
+        'item',
+        @tilset_obj_id,
+        0,
+        0
         );
 
 commit;
@@ -113,6 +137,15 @@ from
     object
 where
     obj_name = 'poison trap';
+
+select 
+    obj_id
+into
+    @heal_potion_id
+from
+    object
+where
+    obj_name = 'heal potion';
 
 
 -- insert des enemy
@@ -200,6 +233,18 @@ insert into
         @poison_trap_id,
         5,
         10
+        ),
+        (
+        @room_id,
+        @heal_potion_id,
+        6,
+        6
+        ),
+        (
+        @room_id,
+        @heal_potion_id,
+        7,
+        1
         );
 
 -- insert des enemy dans la pièce.
