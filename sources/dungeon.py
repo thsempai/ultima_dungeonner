@@ -3,7 +3,9 @@ import cocos
 import random
 
 from db_connection import DBConnection
+from server_connection import ServerConnection
 from controler_manager import CONTROLER
+from character import InventoryFull
 
 TILESETS = {}
 OBJECTS = {}
@@ -60,7 +62,7 @@ class RoomScene(cocos.scene.Scene):
 
         room_dict = DBConnection.getRoom(room_id)
 
-        self.hero = hero
+        self.hero = None
 
         self.__name = room_dict['name']
 
@@ -88,6 +90,8 @@ class RoomScene(cocos.scene.Scene):
         for key, value in self.layer.items():
             self.add(value,z=z[key])
 
+        self.addHero(hero)
+
         self.schedule(self.__callback)
 
 
@@ -98,6 +102,10 @@ class RoomScene(cocos.scene.Scene):
     def __repr__(self):
 
         return "RoomScene '" + self.__name +"'"
+
+    def addHero(self,hero):
+        self.hero = hero
+        self.layer['gui'].refreshInventory(self.hero.inventory)
 
     def moveHero(self,move):
 
@@ -128,6 +136,19 @@ class RoomScene(cocos.scene.Scene):
             else:
                 self.layer['character'].moveHero(move)
 
+            item = self.layer['item'].getItem((x,y))
+
+            if item != None:
+                
+                if item.type == 'item':
+
+                    event = {
+                            'type': 'hero-find-item',
+                            'item': item,
+                            'position': (x,y)
+                            }
+                    self.addEvent(event)
+
             self.__initEnemiesTurn()
 
 
@@ -137,7 +158,9 @@ class RoomScene(cocos.scene.Scene):
 
 
     def __solveEvents(self):
+
         for event in self.__events_queue:
+
             if event['type'] == 'hero-attack':
 
                 msg = self.hero.name + ' hurts ' + str(event['target']) + '.'
@@ -147,6 +170,20 @@ class RoomScene(cocos.scene.Scene):
 
                 msg = str(event['from']) + ' hurts ' + self.hero.name + '.'
                 self.layer['gui'].addMessage(msg)
+
+            elif event['type'] == 'hero-find-item':
+
+                msg = msg = self.hero.name + ' finds ' + str(event['item']) + '.'
+                self.layer['gui'].addMessage(msg)
+
+                try:
+                    self.hero.addItem(event['item'])
+                except InventoryFull:
+                    msg = 'The inventory is full.'
+                    self.layer['gui'].addMessage(msg)
+                else:
+                    self.layer['gui'].refreshInventory(self.hero.inventory)
+                    self.layer['item'].removeItem(event['position'])
 
         self.__events_queue = []
 
@@ -267,6 +304,7 @@ class GUILayer(cocos.layer.Layer):
 
         self.__messages = []
         self.__labels = []
+        self.__inventory = []
 
         x = 500
         y = 120
@@ -283,6 +321,10 @@ class GUILayer(cocos.layer.Layer):
             self.add(self.__labels[-1])
             y -= dy
 
+        img = ServerConnection.getImage('img/gui/gui.png')
+        gui = cocos.sprite.Sprite(img, position = (480,0), anchor=(0,0))
+        self.add(gui)
+
     def addMessage(self, message):
 
         self.__messages.insert(0,message)
@@ -292,6 +334,24 @@ class GUILayer(cocos.layer.Layer):
         
         for index in range(min(5,len(self.__messages))):
             self.__labels[index].element.text = self.__messages[index]
+
+    def refreshInventory(self,inventory):
+
+        for item in self.__inventory:
+            self.remove(item)
+
+        self.__inventory = []
+
+        position = 568,556
+        dpos = 52,0
+
+        for item in inventory:
+            self.__inventory.append(item)
+            item.position = position
+            self.add(item)
+
+            position = position[0] + dpos[0], position[1] + dpos[1]
+
 
 
 class GridLayer(cocos.layer.Layer):
@@ -322,13 +382,33 @@ class ItemLayer(cocos.layer.Layer):
         cocos.layer.Layer.__init__(self)
         self.__obj_dict = {}
 
-        for pos,name in obj_dict.items():
+        for pos,obj in obj_dict.items():
+
+            name = obj['name']
+            typ = obj['type']
+
+            anchor = 0,0
+
+            if typ == 'item':
+                anchor = (0,TILE_SIZE[1]/-6)
 
             img = OBJECTS[name]
-            sp = Sprite(img,pos)
+
+            sp = Sprite(name,typ,img,pos,anchor = anchor)
 
             self.__obj_dict[pos] = sp
             self.add(sp)
+
+    def getItem(self,position):
+
+        if position in self.__obj_dict:
+            return self.__obj_dict[position] 
+
+        return None
+
+    def removeItem(self,position):
+        item = self.__obj_dict.pop(position)
+        self.remove(item)
 
 
 class CharacterLayer(cocos.layer.Layer):
@@ -337,7 +417,7 @@ class CharacterLayer(cocos.layer.Layer):
 
         cocos.layer.Layer.__init__(self)
 
-        self.__hero_sprite = Sprite(hero_image,hero_initial_position,anchor=(0,TILE_SIZE[1]/-6))
+        self.__hero_sprite = Sprite('hero','hero',hero_image,hero_initial_position,anchor=(0,TILE_SIZE[1]/-6))
         
         self.add(self.__hero_sprite)
 
@@ -464,10 +544,16 @@ class CharacterLayer(cocos.layer.Layer):
 
 class Sprite(cocos.sprite.Sprite):
 
-    def __init__(self,image,room_position,anchor=(0,0)):
+    def __init__(self,name,typ,image,room_position,anchor=(0,0)):
 
         cocos.sprite.Sprite.__init__(self,image,anchor=anchor)
         self.room_position = room_position
+        self._name = name
+        self.type = typ
+
+    def __repr__(self):
+
+        return self._name
 
     def room_position():
        
@@ -518,15 +604,14 @@ class Enemy(Sprite):
         img = ENEMIES[name]
         anchor = (0,TILE_SIZE[1]/-6)
 
-        self.__name = name
         self.__lvl = lvl
 
-        Sprite.__init__(self,img,room_position,anchor)
+        Sprite.__init__(self,name,'enemy',img,room_position,anchor)
 
 
     def __repr__(self):
 
-        return self.__name + ' (lvl ' + str(self.__lvl) + ')'
+        return Sprite.__repr__(self) + ' (lvl ' + str(self.__lvl) + ')'
 
 
 class MoveTile(cocos.actions.interval_actions.MoveBy):

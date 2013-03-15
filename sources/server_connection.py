@@ -11,7 +11,8 @@ DIR_LIST =  [
             '~/.udungeon/img',
             '~/.udungeon/img/tileset',
             '~/.udungeon/img/menu',
-            '~/.udungeon/fonts'
+            '~/.udungeon/img/gui',
+            '~/.udungeon/fonts',
             ]
 
 class ServerConnection:

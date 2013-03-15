@@ -10,6 +10,9 @@ def init():
     loadTileset()
     loadObjects()
     loadEnemies()
+    ServerConnection.getClientPath('img/gui/gui.png')
+
+
 
 def getTile(img,pos):
     return img.get_region(pos[0]*TILE_SIZE[0],pos[1]*TILE_SIZE[1],TILE_SIZE[0],TILE_SIZE[1])
