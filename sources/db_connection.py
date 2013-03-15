@@ -62,7 +62,7 @@ class DBConnection:
             room['name'] = data[0]
             room['tileset'] = data[1]
 
-        sql  = 'select obj_name, rob_x, rob_y '
+        sql  = 'select obj_name, obj_type, rob_x, rob_y '
         sql += 'from room_object '
         sql += 'inner join object on rob_obj_xid = obj_id '
         sql += 'where rob_roo_xid = ' + str(room_id)
@@ -71,10 +71,14 @@ class DBConnection:
         data = cursor.fetchall()
 
         for obj in data:
-            pos = obj[1],obj[2]
+            pos = obj[2],obj[3]
             name = obj[0]
+            typ = obj[1]
 
-            room['objects'][pos] = name
+            room['objects'][pos] =  {
+                                    'name' : name,
+                                    'type' : typ
+                                    }
 
         sql  = 'select ene_name, ren_x, ren_y, ren_ene_lvl '
         sql += 'from room_enemy '
