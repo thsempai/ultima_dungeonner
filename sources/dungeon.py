@@ -94,7 +94,6 @@ class RoomScene(cocos.scene.Scene):
 
         self.schedule(self.__callback)
 
-
     def addEvent(self,event):
 
         self.__events_queue.append(event) 
@@ -151,11 +150,9 @@ class RoomScene(cocos.scene.Scene):
 
             self.__initEnemiesTurn()
 
-
     def __initEnemiesTurn(self):
 
         self.__enemies_queue += self.layer['character'].getEnemies().keys()
-
 
     def __solveEvents(self):
 
@@ -163,13 +160,61 @@ class RoomScene(cocos.scene.Scene):
 
             if event['type'] == 'hero-attack':
 
-                msg = self.hero.name + ' hurts ' + str(event['target']) + '.'
-                self.layer['gui'].addMessage(msg)
+                dice = random.randint(1,20)
+
+                r = self.hero.thaco - dice
+
+                if r <= event['target'].ac:
+                    #to touch
+
+                    dgt = random.randint(1,6)
+                    dgt -= event['target'].dr
+
+                    if dgt > 0:
+
+                        event['target'].hp[0] -= dgt
+
+                        msg = self.hero.name + ' hurts ' + str(event['target']) + ' (' + str(dgt) +').'
+                        self.layer['gui'].addMessage(msg)
+
+                    else:
+
+                        msg = str(event['target']) + ' blocks ' + self.hero.name + ' attack.'
+                        self.layer['gui'].addMessage(msg)
+
+                else:
+
+                    msg = str(event['target']) + ' dodges ' + self.hero.name + ' attack.'
+                    self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'enemy-attack':
 
-                msg = str(event['from']) + ' hurts ' + self.hero.name + '.'
-                self.layer['gui'].addMessage(msg)
+                dice = random.randint(1,20)
+
+                r = event['from'].thaco - dice
+
+                if r <= self.hero.ac:
+                    #to touch
+
+                    dgt = random.randint(1,6)
+                    dgt -= self.hero.dr
+
+                    if dgt > 0:
+
+                        self.hero.hp[0] -= dgt
+
+                        msg = str(event['from']) + ' hurts ' + self.hero.name + ' (' + str(dgt) +').'
+                        self.layer['gui'].addMessage(msg)
+
+                    else:
+
+                        msg = self.hero.name + ' blocks ' + str(event['from']) + ' attack.'
+                        self.layer['gui'].addMessage(msg)
+
+                else:
+
+                    msg = self.hero.name + ' dodges ' + str(event['from']) + ' attack.'
+                    self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'hero-find-item':
 
@@ -186,7 +231,6 @@ class RoomScene(cocos.scene.Scene):
                     self.layer['item'].removeItem(event['position'])
 
         self.__events_queue = []
-
 
     def __callback(self,dt):
         
@@ -217,7 +261,6 @@ class RoomScene(cocos.scene.Scene):
 
                     self.layer['character'].updateEnemiesPosition()
                     self.__player_play = True
-
 
 class RoomLayer(cocos.tiles.RectMapLayer):
 
@@ -306,10 +349,9 @@ class GUILayer(cocos.layer.Layer):
         self.__labels = []
         self.__inventory = []
 
-        x = 500
+        x = 485
         y = 120
         dy = 20
-
 
         for n in range(5):
             color = 100, 100, 100, 255
@@ -322,7 +364,7 @@ class GUILayer(cocos.layer.Layer):
             y -= dy
 
         img = ServerConnection.getImage('img/gui/gui.png')
-        gui = cocos.sprite.Sprite(img, position = (480,0), anchor=(0,0))
+        gui = cocos.sprite.Sprite(img, position = (465,0), anchor=(0,0))
         self.add(gui)
 
     def addMessage(self, message):
@@ -342,7 +384,7 @@ class GUILayer(cocos.layer.Layer):
 
         self.__inventory = []
 
-        position = 568,556
+        position = 480,556
         dpos = 52,0
 
         for item in inventory:
@@ -351,7 +393,6 @@ class GUILayer(cocos.layer.Layer):
             self.add(item)
 
             position = position[0] + dpos[0], position[1] + dpos[1]
-
 
 
 class GridLayer(cocos.layer.Layer):
@@ -607,6 +648,11 @@ class Enemy(Sprite):
         self.__lvl = lvl
 
         Sprite.__init__(self,name,'enemy',img,room_position,anchor)
+
+        self.thaco = 20
+        self.ac = 10
+        self.dr = 0
+        self.hp = [10,10]
 
 
     def __repr__(self):
