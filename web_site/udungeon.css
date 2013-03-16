@@ -1,0 +1,30 @@
+*
+    {
+    font-family: arial, sans-serif;
+    color: #EEEEEE;
+    }
+
+body
+    {
+    background: #110000;
+    }
+
+
+h1
+    {
+    text-align: center;
+    }
+
+.screenshot
+    {
+    margin-top: 5px;
+    text-align: center;   
+    }
+
+.date_release
+    {
+    margin-top: 5px;
+    text-align: center;
+    font-style: italic;
+    color: #BBBBBB;  
+    }
