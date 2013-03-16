@@ -1,3 +1,22 @@
+-- insert data_site
+
+insert into
+    data_site
+        (
+        das_field,
+        das_data
+        )
+    values
+        (
+        'version',
+        'alpha v0.1'
+        ),
+        (
+        'release date',
+        '01/04/2013'
+        );
+
+
 -- insert update_file
 
 insert into
