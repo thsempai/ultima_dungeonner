@@ -8,8 +8,8 @@ from initialization import init
 SCREEN_SIZE = 800,600
 
 def test():
-
-    game = cocos.director.director.init(width=SCREEN_SIZE[0], height=SCREEN_SIZE[1], caption="Ultimate Dungeonner")
+    title = "Ultimata Dungeonner alpha v0.01"
+    game = cocos.director.director.init(width=SCREEN_SIZE[0], height=SCREEN_SIZE[1], caption=title)
     hero = Hero()
     dungeon = Dungeon(hero)
 
