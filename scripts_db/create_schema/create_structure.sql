@@ -200,6 +200,20 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`update_file` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `1gam201302`.`data_site`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `1gam201302`.`data_site` (
+  `das_id` INT NOT NULL AUTO_INCREMENT ,
+  `das_field` VARCHAR(45) NOT NULL ,
+  `das_data` VARCHAR(45) NOT NULL ,
+  PRIMARY KEY (`das_id`) ,
+  UNIQUE INDEX `das_field_UNIQUE` (`das_field` ASC) )
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = big5
+COLLATE = big5_chinese_ci;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
