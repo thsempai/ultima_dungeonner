@@ -3,6 +3,9 @@
 import pyglet
 import urllib2
 import os
+import time
+
+from db_connection import DBConnection
 
 SERVER = 'http://sempai.gsmproductions.com/'
 
@@ -21,8 +24,25 @@ class ServerConnection:
         self.__main_directory = os.path.expanduser(DIR_LIST[0]) + '/'
 
     def __downloadFile(self,path):
-        if not os.path.exists(self.__main_directory + path):
 
+        dwl = False
+
+        if not os.path.exists(self.__main_directory + path):
+            dwl = True
+        else:
+            t = time.ctime(os.path.getmtime(self.__main_directory + path))
+            
+            sql =  "select upf_update_date "
+            sql += "from update_file "
+            sql += "where upf_path = '" + str(path) + "' "
+
+            data = DBConnection.getResult(sql)
+
+            if len(data) > 0:
+                if t <= data[0]:
+                    dwl = True
+
+        if dwl:
             u = urllib2.urlopen(SERVER + path)
             try:
                 f = open(self.__main_directory + path,'w')
@@ -34,6 +54,7 @@ class ServerConnection:
 
             finally:
                 u.close()
+
 
         return self.__main_directory + path
 

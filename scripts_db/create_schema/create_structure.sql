@@ -188,6 +188,18 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
+-- -----------------------------------------------------
+-- Table `1gam201302`.`update_file`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `1gam201302`.`update_file` (
+  `upf_id` INT NOT NULL AUTO_INCREMENT ,
+  `upf_path` VARCHAR(45) NOT NULL ,
+  `upf_update_date` DATETIME NOT NULL ,
+  PRIMARY KEY (`upf_id`) ,
+  UNIQUE INDEX `upf_path_UNIQUE` (`upf_path` ASC) )
+ENGINE = InnoDB;
+
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

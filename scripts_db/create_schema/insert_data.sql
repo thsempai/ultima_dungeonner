@@ -1,3 +1,17 @@
+-- insert update_file
+
+insert into
+    update_file
+        (
+        upf_path,
+        upf_update_date
+        )
+    values
+        (
+        'img/gui/gui.png',
+        curdate()
+        );
+
 -- insert a user (Sempai)
 
 insert into 
