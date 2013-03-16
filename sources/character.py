@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from server_connection import ServerConnection
+import getpass
 
 class InventoryFull(Exception):
     def __init__(self):
@@ -11,7 +12,7 @@ class Hero:
     def __init__(self):
 
         self.image = ServerConnection.getImage('img/tileset/hero.png')
-        self.name = 'MySelf'
+        self.name =  getpass.getuser().capitalize()
 
         self.inventory = []
 
