@@ -317,3 +317,74 @@ insert into
         );
 
 commit;
+
+-- insert room
+
+insert into
+    room
+        (
+        roo_name,
+        roo_til_xid,
+        roo_use_xid
+        )
+    values
+        (
+        'second_room',
+        @tilset_room_id,
+        @me
+        );
+
+-- récupération de l'id de la pièce
+
+select
+    max(roo_id)
+into
+    @room_id 
+from
+    room;
+
+-- insert des objets dans la pièce.
+
+insert into
+    room_object
+        (
+        rob_roo_xid,
+        rob_obj_xid,
+        rob_x,
+        rob_y
+        )
+    values
+        (
+        @room_id,
+        @heal_potion_id,
+        1,
+        3
+        ),
+        (
+        @room_id,
+        @heal_potion_id,
+        6,
+        6
+        );
+
+-- insert des enemy dans la pièce.
+
+insert into
+    room_enemy
+        (
+        ren_roo_xid,
+        ren_ene_xid,
+        ren_x,
+        ren_y,
+        ren_ene_lvl
+        )
+    values
+        (
+        @room_id,
+        @imp_id,
+        10,
+        5,
+        1
+        );
+
+commit;
