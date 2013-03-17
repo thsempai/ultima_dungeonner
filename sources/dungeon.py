@@ -25,7 +25,6 @@ class Dungeon(list):
 
         self.changeRoom(0)
 
-
     def __repr__(self):
 
         return "Class Dungeon"
@@ -46,6 +45,7 @@ class Dungeon(list):
         self.__mappingAction()
 
     def on_key_release(self,symbol, modifiers):
+
         CONTROLER.onKeyRelease('dungeon',symbol,modifiers)
 
 
@@ -94,6 +94,8 @@ class RoomScene(cocos.scene.Scene):
 
         self.schedule(self.__callback)
 
+        self.layer['grid'].visible = False
+
     def addEvent(self,event):
 
         self.__events_queue.append(event) 
@@ -127,7 +129,7 @@ class RoomScene(cocos.scene.Scene):
 
                 self.addEvent(event)
 
-                msg = self.hero.name + ' attacks ' + str(event['target']) + '.'
+                msg = str(self.hero) + ' attacks ' + str(event['target']) + '.'
                 self.layer['gui'].addMessage(msg)
 
                 self.layer['character'].heroAttack(move)
@@ -160,65 +162,68 @@ class RoomScene(cocos.scene.Scene):
 
             if event['type'] == 'hero-attack':
 
-                dice = random.randint(1,20)
+                if self.hero.hp > 0:
+                    dice = random.randint(1,20)
 
-                r = self.hero.thaco - dice
+                    r = self.hero.thaco - dice
 
-                if r <= event['target'].ac:
-                    #to touch
+                    if r <= event['target'].ac:
+                        #to touch
 
-                    dgt = random.randint(1,6)
-                    dgt -= event['target'].dr
+                        dgt = random.randint(1,6)
+                        dgt -= event['target'].dr
 
-                    if dgt > 0:
+                        if dgt > 0:
 
-                        event['target'].hp[0] -= dgt
+                            event['target'].hp -= dgt
 
-                        msg = self.hero.name + ' hurts ' + str(event['target']) + ' (' + str(dgt) +').'
-                        self.layer['gui'].addMessage(msg)
+                            msg = str(self.hero) + ' hurts ' + str(event['target']) + ' (' + str(dgt) +').'
+                            self.layer['gui'].addMessage(msg)
+
+                        else:
+
+                            msg = str(event['target']) + ' blocks ' + str(self.hero) + ' attack.'
+                            self.layer['gui'].addMessage(msg)
 
                     else:
 
-                        msg = str(event['target']) + ' blocks ' + self.hero.name + ' attack.'
+                        msg = str(event['target']) + ' dodges ' + str(self.hero) + ' attack.'
                         self.layer['gui'].addMessage(msg)
-
-                else:
-
-                    msg = str(event['target']) + ' dodges ' + self.hero.name + ' attack.'
-                    self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'enemy-attack':
 
-                dice = random.randint(1,20)
+                if event['from'].hp > 0:
 
-                r = event['from'].thaco - dice
+                    dice = random.randint(1,20)
 
-                if r <= self.hero.ac:
-                    #to touch
+                    r = event['from'].thaco - dice
 
-                    dgt = random.randint(1,6)
-                    dgt -= self.hero.dr
+                    if r <= self.hero.ac:
+                        #to touch
 
-                    if dgt > 0:
+                        dgt = random.randint(1,6)
+                        dgt -= self.hero.dr
 
-                        self.hero.hp[0] -= dgt
+                        if dgt > 0:
 
-                        msg = str(event['from']) + ' hurts ' + self.hero.name + ' (' + str(dgt) +').'
-                        self.layer['gui'].addMessage(msg)
+                            self.hero.hp -= dgt
+
+                            msg = str(event['from']) + ' hurts ' + str(self.hero) + ' (' + str(dgt) +').'
+                            self.layer['gui'].addMessage(msg)
+
+                        else:
+
+                            msg = str(self.hero) + ' blocks ' + str(event['from']) + ' attack.'
+                            self.layer['gui'].addMessage(msg)
 
                     else:
 
-                        msg = self.hero.name + ' blocks ' + str(event['from']) + ' attack.'
+                        msg = str(self.hero) + ' dodges ' + str(event['from']) + ' attack.'
                         self.layer['gui'].addMessage(msg)
-
-                else:
-
-                    msg = self.hero.name + ' dodges ' + str(event['from']) + ' attack.'
-                    self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'hero-find-item':
 
-                msg = msg = self.hero.name + ' finds ' + str(event['item']) + '.'
+                msg = msg = str(self.hero) + ' finds ' + str(event['item']) + '.'
                 self.layer['gui'].addMessage(msg)
 
                 try:
@@ -252,7 +257,7 @@ class RoomScene(cocos.scene.Scene):
                     if event != None:
                         if event['type'] == 'enemy-attack':
                             
-                            msg = str(event['from']) + ' attacks ' + self.hero.name + '.'
+                            msg = str(event['from']) + ' attacks ' + str(self.hero) + '.'
 
                             self.layer['gui'].addMessage(msg)
                             self.addEvent(event)
@@ -261,6 +266,18 @@ class RoomScene(cocos.scene.Scene):
 
                     self.layer['character'].updateEnemiesPosition()
                     self.__player_play = True
+
+            self.__checkDeads()
+
+    def __checkDeads(self):
+
+        for enemy in self.layer['character'].getEnemies().values():
+
+            if enemy.hp <= 0:
+                msg = str(enemy) + ' dies.'
+                self.layer['gui'].addMessage(msg)
+                self.layer['character'].kill(enemy)
+
 
 class RoomLayer(cocos.tiles.RectMapLayer):
 
@@ -273,8 +290,7 @@ class RoomLayer(cocos.tiles.RectMapLayer):
         self.__applyTiles()
 
         cocos.tiles.RectMapLayer.__init__(self,'room',self.size[0],self.size[1],self.cells)
-        self.set_view(0,0,self.size[0]*TILE_SIZE[0], self.size[1]*TILE_SIZE[0])
-        
+        self.set_view(0,0,self.size[0]*TILE_SIZE[0], self.size[1]*TILE_SIZE[0])  
 
     def __build(self):
         self.cells = []
@@ -464,6 +480,7 @@ class CharacterLayer(cocos.layer.Layer):
 
         self.__ene_dict = {}
 
+
         for pos,enemy in ene_dict.items():
 
             name = enemy[0]
@@ -474,7 +491,14 @@ class CharacterLayer(cocos.layer.Layer):
             self.__ene_dict[pos] = ene
             self.add(ene)
 
-    
+    def kill(self,enemy):
+
+        position = enemy.room_position
+        self.__ene_dict.pop(position)
+        self.remove(enemy)
+
+
+
     def onAnimation(self):
         if self.__hero_sprite.are_actions_running():
             return True
@@ -500,7 +524,6 @@ class CharacterLayer(cocos.layer.Layer):
 
         return self.__ene_dict
 
-
     def moveHero(self, move):
 
         self.__hero_sprite.move(move)
@@ -518,8 +541,11 @@ class CharacterLayer(cocos.layer.Layer):
 
         self.__ene_dict = new_dict
 
-
     def moveEnemy(self,position):
+
+        if not self.__ene_dict.has_key(position):
+
+            return None
 
         hero_position = self.__hero_sprite.room_position
         enemy =  self.__ene_dict[position]
@@ -632,11 +658,22 @@ class Sprite(cocos.sprite.Sprite):
         rmove = cocos.actions.base_actions.Reverse(move)
         self.do(move + rmove)
 
-
     def move(self,move):
 
         self.do(MoveTile(move))
 
+
+class Particle(cocos.sprite.Sprite):
+
+    def __init__(self,sprite,region,speed):
+
+        image = sprite.image.get_region(*region)
+        position = region[:2]
+
+        self.Sprite(image,position=position,anchor=(0,0))
+        self.__life = 2.
+        self.__speed = speed
+ 
     
 class Enemy(Sprite):
 
@@ -652,12 +689,36 @@ class Enemy(Sprite):
         self.thaco = 20
         self.ac = 10
         self.dr = 0
-        self.hp = [10,10]
-
+        self.__hp = [1,1]
 
     def __repr__(self):
 
         return Sprite.__repr__(self) + ' (lvl ' + str(self.__lvl) + ')'
+
+    def hp():
+       
+        #doc
+        doc = "healt point"
+        
+        #getter
+        def fget(self):
+
+            hp = self.__hp[0]
+
+            return self.__hp[0]
+        
+        #setter
+        def fset(self, hp):
+
+            self.__hp[0] = min(hp, self.__hp[1])
+        
+        #deleter
+        def fdel(self):
+            pass
+
+        return locals()
+
+    hp = property(**hp())
 
 
 class MoveTile(cocos.actions.interval_actions.MoveBy):

@@ -19,8 +19,11 @@ class Hero:
         self.__thaco = 20
         self.__ac = 10
         self.__dr = 0
+        self.__hp = [10,10]
 
-        self.hp = [10,10]
+    def __repr__(self):
+
+        return self.name
 
     def thaco():
        
@@ -99,6 +102,32 @@ class Hero:
         return locals()
 
     dr = property(**dr())
+
+
+    def hp():
+       
+        #doc
+        doc = "healt point"
+        
+        #getter
+        def fget(self):
+
+            hp = self.__hp[0]
+
+            return self.__hp[0]
+        
+        #setter
+        def fset(self, hp):
+            
+            self.__hp[0] = min(self.__hp[0] + hp, self.__hp[1])
+        
+        #deleter
+        def fdel(self):
+            pass
+
+        return locals()
+
+    hp = property(**hp())
 
 
     def addItem(self,item):

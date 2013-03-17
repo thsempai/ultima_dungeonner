@@ -75,6 +75,7 @@ class ServerConnection:
 
     @staticmethod
     def getImage(path,region = None):
+        
         if region == None:
             return pyglet.image.load(ServerConnection.getClientPath(path))
         else:
