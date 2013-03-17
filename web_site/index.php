@@ -48,7 +48,7 @@
         </div>
             
         <div class="date_release">
-            Release update : <?php echo $release_date; ?>
+            Release date : <?php echo $release_date; ?>
         </div>
 
     </body>
