@@ -496,6 +496,21 @@ class CharacterLayer(cocos.layer.Layer):
         position = enemy.room_position
         self.__ene_dict.pop(position)
         self.remove(enemy)
+        n = 0
+        for x in range(TILE_SIZE[0]):
+            for y in range(TILE_SIZE[1]):
+                n+=1
+
+                if n%3==0:
+                    reg = (x,y,1,1)
+                    speed = TILE_SIZE[0] * random.random(), TILE_SIZE[1] * random.random()
+                    speed = speed[0] * [1,-1][random.randint(0,1)], speed[1] * [1,-1][random.randint(0,1)]
+
+                    part = Particle(enemy, reg,anchor=(0,TILE_SIZE[1]/-6))
+                    move = cocos.actions.interval_actions.MoveBy(speed,duration=1.)
+                    
+                    self.add(part)
+                    part.do(move)
 
 
 
@@ -665,14 +680,25 @@ class Sprite(cocos.sprite.Sprite):
 
 class Particle(cocos.sprite.Sprite):
 
-    def __init__(self,sprite,region,speed):
+    def __init__(self,sprite,region,anchor=(0,0)):
 
         image = sprite.image.get_region(*region)
-        position = region[:2]
 
-        self.Sprite(image,position=position,anchor=(0,0))
-        self.__life = 2.
-        self.__speed = speed
+        position = region[:2]
+        position = -1 * anchor[0] + position[0], -1* anchor[1] + position[1]
+        position = sprite.position[0] + position[0], sprite.position[1] + position[1]  
+
+        cocos.sprite.Sprite.__init__(self,image,position=position,anchor=(0,0))
+        self.life = 1.
+
+        self.schedule(self.__callback)
+
+    def __callback(self,dt):
+
+        self.life -= dt
+
+        if self.life <= 0.:
+            self.kill()
  
 
 class Enemy(Sprite):
@@ -687,7 +713,7 @@ class Enemy(Sprite):
         Sprite.__init__(self,name,'enemy',img,room_position,anchor)
 
         self.thaco = 20
-        self.ac = 10
+        self.ac = 20
         self.dr = 0
         self.__hp = [1,1]
 
