@@ -55,8 +55,12 @@ def loadTileset():
 
             tileset = cocos.tiles.TileSet(name, None)
             for n, p in tiles.items():
-                prop =  {   'passable': True
+                prop =  {   'passable': True,
+                            'transition' : False
                         }
+
+                if n == 'door-n':
+                    prop['transition'] = True
 
                 tileset.add( prop, getTile(img,p), n)
                 dic[name] = tileset

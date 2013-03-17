@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import cocos
+#import fait pour contrer un bug(?)
+import cocos.scenes
 import random
 
 from db_connection import DBConnection
@@ -20,8 +22,10 @@ class Dungeon(list):
         self.hero = hero
         #uniquement pour les tests
         self.append(RoomScene(3,self.hero))
+        self.append(RoomScene(4,self.hero))
 
         self.__active_room = None
+        self.__index = 0
 
         self.changeRoom(0)
 
@@ -32,6 +36,7 @@ class Dungeon(list):
     def __mappingAction(self):
 
         room = self.__active_room
+        self.__active_room.mapNext(self.nextRoom)
 
         CONTROLER.defineCommand('dungeon','hero_up',room.moveHero,[(0,1)])
         CONTROLER.defineCommand('dungeon','hero_down',room.moveHero,[(0,-1)])
@@ -41,8 +46,21 @@ class Dungeon(list):
 
     def changeRoom(self,index):
 
-        self.__active_room = self[0]
+        self.__active_room = self[index]
+        self.__index = index
         self.__mappingAction()
+
+    def nextRoom(self):
+
+        self.__index += 1
+        if len(self) > self.__index:
+            #changement à faire ici pour les games conditions
+
+            self.changeRoom(self.__index)
+
+            room = cocos.scenes.transitions.SlideInTTransition(self.__active_room)
+
+            cocos.director.director.replace(room)
 
     def on_key_release(self,symbol, modifiers):
 
@@ -71,6 +89,8 @@ class RoomScene(cocos.scene.Scene):
         self.__player_play = True
 
         self.__enemies_queue = []
+
+        self.__next =  None
 
         self.layer =    {
                         "room" : RoomLayer(room_dict['tileset'],self.size),
@@ -107,6 +127,10 @@ class RoomScene(cocos.scene.Scene):
     def addHero(self,hero):
         self.hero = hero
         self.layer['gui'].refreshInventory(self.hero.inventory)
+
+    def mapNext(self,fct):
+
+        self.__next = fct
 
     def moveHero(self,move):
 
@@ -269,6 +293,13 @@ class RoomScene(cocos.scene.Scene):
 
             self.__checkDeads()
 
+            h_pos = self.layer['character'].getHeroPosition()
+
+            if self.layer['room'].isTransition(h_pos):
+                self.__next()
+                
+
+
     def __checkDeads(self):
 
         for enemy in self.layer['character'].getEnemies().values():
@@ -338,6 +369,10 @@ class RoomLayer(cocos.tiles.RectMapLayer):
     def _isValid(self,position):
 
         x,y = position
+        
+        #entrée
+        if x == 6 and y == 13:
+            return True
 
         if x < 0 or x >= self.size[0]:
             return False
@@ -348,12 +383,21 @@ class RoomLayer(cocos.tiles.RectMapLayer):
         return True
 
     def isPassable(self, position):
+        
         x,y = position
         
         if self._isValid(position):
+
             return self.get_cell(x,y)['passable']
 
         return False
+
+    def isTransition(self,(x,y)):
+        #à corriger
+        if x == 6 and y == 13:
+            return True
+
+        return self.get_cell(x,y)['transition']
 
 
 class GUILayer(cocos.layer.Layer):

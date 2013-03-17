@@ -21,6 +21,7 @@ def test():
     dungeon = Dungeon(hero)
 
     game.push_handlers(dungeon)
+    
     cocos.director.director.run(dungeon[0])
 
 if __name__ == "__main__":
