@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from server_connection import ServerConnection
-import getpass
 
 class InventoryFull(Exception):
     def __init__(self):
@@ -9,10 +8,10 @@ class InventoryFull(Exception):
 
 class Hero:
 
-    def __init__(self):
+    def __init__(self,name):
 
         self.image = ServerConnection.getImage('img/tileset/hero.png')
-        self.name =  getpass.getuser().capitalize()
+        self.name =  name.capitalize()
 
         self.inventory = []
 
@@ -118,7 +117,7 @@ class Hero:
         
         #setter
         def fset(self, hp):
-            
+
             self.__hp[0] = min(self.__hp[0] + hp, self.__hp[1])
         
         #deleter

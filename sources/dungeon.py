@@ -674,7 +674,7 @@ class Particle(cocos.sprite.Sprite):
         self.__life = 2.
         self.__speed = speed
  
-    
+
 class Enemy(Sprite):
 
     def __init__(self,name,lvl,room_position):

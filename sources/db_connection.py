@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
+import time
+import datetime
 
 DB_SERVER = '1gamdb.gsmproductions.com'
 DB_USER = '1gamuser_dev'
@@ -28,6 +30,21 @@ class DBConnection:
             db.close()
 
         return cursor
+
+    def __convert(self, val):
+
+        if type(val) == str:
+            val = "'" + val + "'"
+        else:
+            val = str(val)
+
+        return val
+
+    def __insert(self,table,data):
+        pass
+
+    def __update(self, table, id, data):
+        pass
 
     @staticmethod
     def getResult(sql):
@@ -96,3 +113,37 @@ class DBConnection:
 
         return room
 
+    @staticmethod
+    def getUser(nickname):
+
+        db = DBConnection()
+
+        sql  = "select use_id, use_nickname "
+        sql += "from user "
+        sql += "where use_nickname = '" + str(nickname) + "'"
+
+        cursor = db.__getCursor(sql)
+        data = cursor.fetchone()
+
+        now = datetime.datetime.fromtimestamp(time.mktime(time.gmtime()))
+
+        if data != None:
+            user =  { 
+                    'name'  : data[1]
+                    }
+
+            db.__update('user', ('roo_id',data[0]),{'roo_last_connection':time.gmtime()})
+        else:
+            user =  { 
+                    'name'  : nickname
+                    }
+
+            data =  {
+                    'use_nickname' : nickname,
+                    'use_last_connection' : time.ctime(),
+                    'use_creation' : time.ctime()
+                    }
+
+            db.__insert('user', data)
+
+        return user
