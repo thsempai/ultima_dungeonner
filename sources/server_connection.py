@@ -4,6 +4,7 @@ import pyglet
 import urllib2
 import os
 import time
+import datetime
 
 from db_connection import DBConnection
 
@@ -30,7 +31,8 @@ class ServerConnection:
         if not os.path.exists(self.__main_directory + path):
             dwl = True
         else:
-            t = time.ctime(os.path.getmtime(self.__main_directory + path))
+            t = time.gmtime(os.path.getmtime(self.__main_directory + path))
+            t = datetime.datetime.fromtimestamp(time.mktime(t))
             
             sql =  "select upf_update_date "
             sql += "from update_file "
@@ -39,7 +41,7 @@ class ServerConnection:
             data = DBConnection.getResult(sql)
 
             if len(data) > 0:
-                if t <= data[0]:
+                if t <= data[0][0]:
                     dwl = True
 
         if dwl:
@@ -75,7 +77,7 @@ class ServerConnection:
 
     @staticmethod
     def getImage(path,region = None):
-        
+
         if region == None:
             return pyglet.image.load(ServerConnection.getClientPath(path))
         else:
