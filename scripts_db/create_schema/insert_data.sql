@@ -37,11 +37,13 @@ insert into
     user
         (
         use_nickname,
+        use_creation,
         use_password
         )
     values
         (
-        'sempai',
+        'Creator',
+        curdate(),
         ''
         );
 
@@ -56,7 +58,7 @@ into
 from 
     user
 where
-    use_nickname = 'sempai';
+    use_nickname = 'Creator';
 
 -- insert tileset
 

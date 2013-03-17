@@ -60,6 +60,8 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`user` (
   `use_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `use_nickname` VARCHAR(45) NOT NULL ,
   `use_password` VARCHAR(45) NOT NULL ,
+  `use_last_connection` DATETIME NULL ,
+  `use_creation` DATETIME NOT NULL ,
   PRIMARY KEY (`use_id`) ,
   UNIQUE INDEX `ndx_use_name` (`use_nickname` ASC) )
 ENGINE = InnoDB
