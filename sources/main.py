@@ -10,7 +10,7 @@ from user import User
 SCREEN_SIZE = 800,600
 
 def test():
-    title = "Ultimata Dungeonner alpha v0.01"
+    title = "Ultima Dungeonner alpha v0.01"
     game = cocos.director.director.init(width=SCREEN_SIZE[0], height=SCREEN_SIZE[1], caption=title)
     
     user = DBConnection.getUser(getpass.getuser())
