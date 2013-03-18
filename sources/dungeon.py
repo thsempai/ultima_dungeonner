@@ -61,11 +61,14 @@ class Dungeon(list):
             room = cocos.scenes.transitions.SlideInTTransition(self.__active_room)
 
             cocos.director.director.replace(room)
+            self.__active_room.layer['gui'].refreshInventory(self.hero.inventory)
 
     def on_key_release(self,symbol, modifiers):
 
         CONTROLER.onKeyRelease('dungeon',symbol,modifiers)
 
+    def on_mouse_motion(self, x, y, dx, dy):
+        self.__active_room.showTile((x,y))
 
 class RoomScene(cocos.scene.Scene):
 
@@ -298,8 +301,6 @@ class RoomScene(cocos.scene.Scene):
             if self.layer['room'].isTransition(h_pos):
                 self.__next()
                 
-
-
     def __checkDeads(self):
 
         for enemy in self.layer['character'].getEnemies().values():
@@ -309,6 +310,30 @@ class RoomScene(cocos.scene.Scene):
                 self.layer['gui'].addMessage(msg)
                 self.layer['character'].kill(enemy)
 
+    def showTile(self,(x,y)):
+        
+        dx,dy = 1,1
+        x,y = int(x/TILE_SIZE[0]) - dx, int(y/TILE_SIZE[1]) - dy
+        img = { 'image': None }
+
+        if self.layer['character'].getHeroPosition() == (x,y):
+            img['image'] = self.hero.image
+
+        else:
+            sp = self.layer['character'].getEnemy((x,y))
+            
+            if sp != None:
+                img['image'] = sp.image
+
+            else:
+                sp = self.layer['item'].getItem((x,y))
+
+                if sp != None:
+                    img['image'] = sp.image
+
+        img['position'] = (x,y)
+        self.layer['gui'].showImage(img)
+ 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
 
@@ -427,6 +452,27 @@ class GUILayer(cocos.layer.Layer):
         gui = cocos.sprite.Sprite(img, position = (465,0), anchor=(0,0))
         self.add(gui)
 
+        self.__show =   {
+                        'image':None,
+                        'position':(-1,-1)
+                        }
+
+
+    def showImage(self,img):
+
+        x = 479
+        y = 214
+
+        if img['position'] != self.__show['position']:
+            if self.__show.has_key('sprite'):
+                self.__show['sprite'].kill()
+                self.__show = img
+        
+            if img['image'] != None:
+                self.__show = img
+                self.__show['sprite'] = cocos.sprite.Sprite(self.__show['image'],position=(x,y),anchor=(0,0))
+                self.add(self.__show['sprite'])
+
     def addMessage(self, message):
 
         self.__messages.insert(0,message)
@@ -444,7 +490,7 @@ class GUILayer(cocos.layer.Layer):
 
         self.__inventory = []
 
-        position = 480,556
+        position = 479 ,550
         dpos = 52,0
 
         for item in inventory:
@@ -555,8 +601,6 @@ class CharacterLayer(cocos.layer.Layer):
                     
                     self.add(part)
                     part.do(move)
-
-
 
     def onAnimation(self):
         if self.__hero_sprite.are_actions_running():
