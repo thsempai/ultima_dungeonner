@@ -132,6 +132,6 @@ class Hero:
     def addItem(self,item):
         if len(self.inventory) > 3:
             raise InventoryFull
-
+        
         self.inventory.append(item)
 
