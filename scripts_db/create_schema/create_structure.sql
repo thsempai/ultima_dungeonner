@@ -41,6 +41,7 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`object` (
   `obj_til_xid` INT(11) NOT NULL ,
   `obj_til_x` INT(11) NOT NULL ,
   `obj_til_y` INT(11) NOT NULL ,
+  `obj_description` VARCHAR(100) NOT NULL ,
   PRIMARY KEY (`obj_id`) ,
   INDEX `fk_tileset_fk` (`obj_til_xid` ASC) ,
   CONSTRAINT `fk_tileset_fk`
@@ -153,6 +154,7 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`enemy` (
   `ene_til_xid` INT(11) NOT NULL ,
   `ene_til_x` INT NOT NULL ,
   `ene_til_y` INT NOT NULL ,
+  `ene_description` VARCHAR(100) NOT NULL ,
   PRIMARY KEY (`ene_id`) ,
   UNIQUE INDEX `ene_name_UNIQUE` (`ene_name` ASC) ,
   INDEX `fk_tileset_fk2` (`ene_til_xid` ASC) ,
