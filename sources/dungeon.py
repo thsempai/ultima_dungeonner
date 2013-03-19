@@ -9,9 +9,14 @@ from server_connection import ServerConnection
 from controler_manager import CONTROLER
 from character import InventoryFull
 
-TILESETS = {}
-OBJECTS = {}
-ENEMIES = {}
+TILESETS    = {}
+OBJECTS     = {}
+ENEMIES     = {}
+
+TEXTS       =   {
+                    'enemy'     : {},
+                    'object'    : {}
+                }
 
 TILE_SIZE = 32,32
 
@@ -69,6 +74,7 @@ class Dungeon(list):
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.__active_room.showTile((x,y))
+
 
 class RoomScene(cocos.scene.Scene):
 
@@ -314,22 +320,28 @@ class RoomScene(cocos.scene.Scene):
         
         dx,dy = 1,1
         x,y = int(x/TILE_SIZE[0]) - dx, int(y/TILE_SIZE[1]) - dy
-        img = { 'image': None }
+        img =   { 
+                'image': None, 
+                'description' : '' 
+                }
 
         if self.layer['character'].getHeroPosition() == (x,y):
             img['image'] = self.hero.image
+            img['description'] = 'This is you...'
 
         else:
             sp = self.layer['character'].getEnemy((x,y))
             
             if sp != None:
                 img['image'] = sp.image
+                img['description'] = str(sp).capitalize() + ':\n' + TEXTS['enemy'][str(sp)]
 
             else:
                 sp = self.layer['item'].getItem((x,y))
 
                 if sp != None:
                     img['image'] = sp.image
+                    img['description'] = str(sp).capitalize() + ':\n' + TEXTS['object'][str(sp)]
 
         img['position'] = (x,y)
         self.layer['gui'].showImage(img)
@@ -457,6 +469,8 @@ class GUILayer(cocos.layer.Layer):
                         'position':(-1,-1)
                         }
 
+        self.__description = None
+
 
     def showImage(self,img):
 
@@ -467,11 +481,17 @@ class GUILayer(cocos.layer.Layer):
             if self.__show.has_key('sprite'):
                 self.__show['sprite'].kill()
                 self.__show = img
+                if self.__description != None:
+                    self.__description.kill()
         
             if img['image'] != None:
                 self.__show = img
                 self.__show['sprite'] = cocos.sprite.Sprite(self.__show['image'],position=(x,y),anchor=(0,0))
                 self.add(self.__show['sprite'])
+
+                t =  self.__show['description']
+                self.__description = cocos.text.RichLabel(text=t,position=(535,235),width=238,multiline=True)
+                self.add(self.__description)
 
     def addMessage(self, message):
 
@@ -804,10 +824,6 @@ class Enemy(Sprite):
         self.ac = 20
         self.dr = 0
         self.__hp = [1,1]
-
-    def __repr__(self):
-
-        return Sprite.__repr__(self) + ' (lvl ' + str(self.__lvl) + ')'
 
     def hp():
        

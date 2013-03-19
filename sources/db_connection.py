@@ -15,6 +15,7 @@ class DBConnection:
         pass
 
     def __getConnection(self):
+
         connect = MySQLdb.connect(DB_SERVER,DB_USER,PASSWORD,SCHEMA)
         return connect
 
