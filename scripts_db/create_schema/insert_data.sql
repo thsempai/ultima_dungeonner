@@ -140,14 +140,16 @@ insert into
         (
         obj_name,
         obj_type,
+        obj_description,
         obj_til_xid,
         obj_til_x,
         obj_til_y
         )
     values
         (
-        'poison trap',
+        'poisoned trap',
         'trap',
+        'If you walk on this you will be poisoned.',
         @tilset_trap_id,
         0,
         1
@@ -155,6 +157,7 @@ insert into
         (
         'heal potion',
         'item',
+        'Flash with a red  liquide. Heals body.',
         @tilset_obj_id,
         0,
         0
@@ -171,7 +174,7 @@ into
 from
     object
 where
-    obj_name = 'poison trap';
+    obj_name = 'poisoned trap';
 
 select 
     obj_id
@@ -189,6 +192,7 @@ insert
     enemy
         (
         ene_name,
+        ene_description,
         ene_til_xid,
         ene_til_x,
         ene_til_y
@@ -196,6 +200,7 @@ insert
     values
         (
         'imp',
+        'Little monster blue with sharp teeth.',
         @tileset_imp_id,
         0,
         0

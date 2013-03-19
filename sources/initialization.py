@@ -3,7 +3,7 @@ import cocos
 
 from db_connection import DBConnection
 from server_connection import ServerConnection
-from dungeon import TILESETS, OBJECTS, ENEMIES, TILE_SIZE
+from dungeon import TILESETS, OBJECTS, ENEMIES, TEXTS, TILE_SIZE
 
 def init():
     ServerConnection.createDirectories()
@@ -72,44 +72,57 @@ def loadTileset():
 
 def loadObjects():
 
-    sql =  "select obj_name, til_path, obj_til_x, obj_til_y "
+    sql =  "select obj_name, obj_description, til_path, obj_til_x, obj_til_y "
     sql += "from object "
     sql += "inner join tileset on obj_til_xid = til_id ";
 
     rows = DBConnection.getResult(sql)
 
     dic = {}
+    text = {}
 
     for obj in rows:
         name = obj[0]
-        region = obj[2] * TILE_SIZE[0], obj[3] * TILE_SIZE[0], TILE_SIZE[0], TILE_SIZE[1]
-        path = obj[1]
+        decription = obj[1]
+        region = obj[3] * TILE_SIZE[0], obj[4] * TILE_SIZE[0], TILE_SIZE[0], TILE_SIZE[1]
+        path = obj[2]
 
         img = ServerConnection.getImage(path,region)
 
+        text[name]= decription
         dic[name] = img
 
     global OBJECTS
+    global TEXTS
+
     OBJECTS.update(dic)
+    TEXTS['object'].update(text)
 
 def loadEnemies():
 
-    sql =  "select ene_name, til_path, ene_til_x, ene_til_y "
+    sql =  "select ene_name, ene_description, til_path, ene_til_x, ene_til_y "
     sql += "from enemy "
     sql += "inner join tileset on ene_til_xid = til_id ";
 
     rows = DBConnection.getResult(sql)
 
     dic = {}
+    text = {}
 
     for ene in rows:
         name = ene[0]
-        region = ene[2] * TILE_SIZE[0], ene[3] * TILE_SIZE[0], TILE_SIZE[0], TILE_SIZE[1]
-        path = ene[1]
+        decription = ene[1]
+        region = ene[3] * TILE_SIZE[0], ene[4] * TILE_SIZE[0], TILE_SIZE[0], TILE_SIZE[1]
+        path = ene[2]
 
         img = ServerConnection.getImage(path,region)
 
         dic[name] = img
+        text[name]= decription
 
     global ENEMIES
+    global TEXTS
+
+
     ENEMIES.update(dic)
+    TEXTS['enemy'].update(text)
