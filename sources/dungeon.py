@@ -210,17 +210,17 @@ class RoomScene(cocos.scene.Scene):
 
                             event['target'].hp -= dgt
 
-                            msg = str(self.hero) + ' hurts ' + str(event['target']) + ' (' + str(dgt) +').'
+                            msg = str(self.hero).capitalize() + ' hurts ' + str(event['target']).capitalize() + ' (' + str(dgt) +').'
                             self.layer['gui'].addMessage(msg)
 
                         else:
 
-                            msg = str(event['target']) + ' blocks ' + str(self.hero) + ' attack.'
+                            msg = str(event['target']).capitalize() + ' blocks ' + str(self.hero).capitalize() + ' attack.'
                             self.layer['gui'].addMessage(msg)
 
                     else:
 
-                        msg = str(event['target']) + ' dodges ' + str(self.hero) + ' attack.'
+                        msg = str(event['target']).capitalize() + ' dodges ' + str(self.hero).capitalize() + ' attack.'
                         self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'enemy-attack':
@@ -290,7 +290,7 @@ class RoomScene(cocos.scene.Scene):
                     if event != None:
                         if event['type'] == 'enemy-attack':
                             
-                            msg = str(event['from']) + ' attacks ' + str(self.hero) + '.'
+                            msg = str(event['from']).capitalize() + ' attacks ' + str(self.hero) + '.'
 
                             self.layer['gui'].addMessage(msg)
                             self.addEvent(event)
@@ -312,38 +312,45 @@ class RoomScene(cocos.scene.Scene):
         for enemy in self.layer['character'].getEnemies().values():
 
             if enemy.hp <= 0:
-                msg = str(enemy) + ' dies.'
+                msg = str(enemy).capitalize() + ' dies.'
                 self.layer['gui'].addMessage(msg)
                 self.layer['character'].kill(enemy)
 
     def showTile(self,(x,y)):
         
         dx,dy = 1,1
-        x,y = int(x/TILE_SIZE[0]) - dx, int(y/TILE_SIZE[1]) - dy
+        tx,ty = int(x/TILE_SIZE[0]) - dx, int(y/TILE_SIZE[1]) - dy
         img =   { 
                 'image': None, 
                 'description' : '' 
                 }
 
-        if self.layer['character'].getHeroPosition() == (x,y):
+        if self.layer['character'].getHeroPosition() == (tx,ty):
             img['image'] = self.hero.image
             img['description'] = 'This is you...'
 
         else:
-            sp = self.layer['character'].getEnemy((x,y))
+            sp = self.layer['character'].getEnemy((tx,ty))
             
             if sp != None:
                 img['image'] = sp.image
                 img['description'] = str(sp).capitalize() + ':\n' + TEXTS['enemy'][str(sp)]
 
             else:
-                sp = self.layer['item'].getItem((x,y))
+                sp = self.layer['gui'].getItem((x,y))
 
                 if sp != None:
                     img['image'] = sp.image
                     img['description'] = str(sp).capitalize() + ':\n' + TEXTS['object'][str(sp)]
 
-        img['position'] = (x,y)
+                else:
+                    sp = self.layer['item'].getItem((tx,ty))
+
+                    if sp != None:
+                        img['image'] = sp.image
+                        img['description'] = str(sp).capitalize() + ':\n' + TEXTS['object'][str(sp)]
+
+        img['position'] = (tx,ty)
         self.layer['gui'].showImage(img)
  
 
@@ -440,6 +447,7 @@ class RoomLayer(cocos.tiles.RectMapLayer):
 class GUILayer(cocos.layer.Layer):
 
     def __init__(self):
+
         cocos.layer.Layer.__init__(self)
 
         self.__messages = []
@@ -497,6 +505,14 @@ class GUILayer(cocos.layer.Layer):
 
         self.__messages.insert(0,message)
         self.__updateLabel()
+
+    def getItem(self,(x,y)):
+
+        for item in self.__inventory:
+            if item.get_rect().contains(x,y):
+                return item 
+
+        return None
 
     def __updateLabel(self):
         
