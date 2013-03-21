@@ -7,12 +7,35 @@ CREATE SCHEMA IF NOT EXISTS `1gam201302` DEFAULT CHARACTER SET utf8 ;
 USE `1gam201302` ;
 
 -- -----------------------------------------------------
+-- Table `1gam201302`.`user`
+-- -----------------------------------------------------
+CREATE  TABLE IF NOT EXISTS `1gam201302`.`user` (
+  `use_id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `use_nickname` VARCHAR(45) NOT NULL ,
+  `use_password` VARCHAR(45) NOT NULL ,
+  `use_last_connection` DATETIME NULL ,
+  `use_creation` DATETIME NOT NULL ,
+  PRIMARY KEY (`use_id`) ,
+  UNIQUE INDEX `ndx_use_name` (`use_nickname` ASC) )
+ENGINE = InnoDB
+AUTO_INCREMENT = 6
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
 -- Table `1gam201302`.`dungeon`
 -- -----------------------------------------------------
 CREATE  TABLE IF NOT EXISTS `1gam201302`.`dungeon` (
   `dun_id` INT(11) NOT NULL AUTO_INCREMENT ,
   `dun_date` DATE NULL DEFAULT NULL ,
-  PRIMARY KEY (`dun_id`) )
+  `dun_use_xid` INT(11) NOT NULL ,
+  PRIMARY KEY (`dun_id`) ,
+  INDEX `fk_user_fk2` (`dun_use_xid` ASC) ,
+  CONSTRAINT `fk_user_fk2`
+    FOREIGN KEY (`dun_use_xid` )
+    REFERENCES `1gam201302`.`user` (`use_id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -51,22 +74,6 @@ CREATE  TABLE IF NOT EXISTS `1gam201302`.`object` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 AUTO_INCREMENT = 4
-DEFAULT CHARACTER SET = utf8;
-
-
--- -----------------------------------------------------
--- Table `1gam201302`.`user`
--- -----------------------------------------------------
-CREATE  TABLE IF NOT EXISTS `1gam201302`.`user` (
-  `use_id` INT(11) NOT NULL AUTO_INCREMENT ,
-  `use_nickname` VARCHAR(45) NOT NULL ,
-  `use_password` VARCHAR(45) NOT NULL ,
-  `use_last_connection` DATETIME NULL ,
-  `use_creation` DATETIME NOT NULL ,
-  PRIMARY KEY (`use_id`) ,
-  UNIQUE INDEX `ndx_use_name` (`use_nickname` ASC) )
-ENGINE = InnoDB
-AUTO_INCREMENT = 6
 DEFAULT CHARACTER SET = utf8;
 
 
