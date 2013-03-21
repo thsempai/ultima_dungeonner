@@ -3,6 +3,8 @@ import MySQLdb
 import time
 import datetime
 
+from ud_exception import UDungeonException
+
 DB_SERVER = '1gamdb.gsmproductions.com'
 DB_USER = '1gamuser_dev'
 PASSWORD = '1gameamonth'
@@ -19,7 +21,7 @@ class DBConnection:
         connect = MySQLdb.connect(DB_SERVER,DB_USER,PASSWORD,SCHEMA)
         return connect
 
-    def __getCursor(self,sql):
+    def __getCursor(self,sql,commit=False):
 
 
         db = self.__getConnection()
@@ -27,6 +29,11 @@ class DBConnection:
         try:   
             cursor  = db.cursor()
             cursor.execute(sql)
+            
+            if commit:
+                db.commit()
+        except:
+            db.rollback()
         finally:
             db.close()
 
@@ -119,32 +126,17 @@ class DBConnection:
 
         db = DBConnection()
 
-        sql  = "select use_id, use_nickname "
-        sql += "from user "
-        sql += "where use_nickname = '" + str(nickname) + "'"
+        sql  = "select get_user('" + nickname + "')"
 
-        cursor = db.__getCursor(sql)
+        cursor = db.__getCursor(sql,commit=True)
         data = cursor.fetchone()
 
-        now = datetime.datetime.fromtimestamp(time.mktime(time.gmtime()))
+        if data == None:
+            raise UDungeonException("User " +  str(nickname) + " not found.")
 
-        if data != None:
-            user =  { 
-                    'name'  : data[1]
-                    }
-
-            db.__update('user', ('roo_id',data[0]),{'roo_last_connection':time.gmtime()})
-        else:
-            user =  { 
-                    'name'  : nickname
-                    }
-
-            data =  {
-                    'use_nickname' : nickname,
-                    'use_last_connection' : time.ctime(),
-                    'use_creation' : time.ctime()
-                    }
-
-            db.__insert('user', data)
+        user =  {
+                'name' : nickname,
+                'id' : data[0]
+                }
 
         return user

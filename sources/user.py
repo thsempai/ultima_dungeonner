@@ -7,6 +7,7 @@ class User:
     def __init__(self,data):
 
         self.name = data['name']
+        self.id = data['id']
 
     def getHero(self):
 
