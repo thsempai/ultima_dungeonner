@@ -107,7 +107,7 @@ class RoomScene(cocos.scene.Scene):
                         "item" : ItemLayer(room_dict['objects']),
                         "grid" : GridLayer(TILE_SIZE,self.size),
                         "character" : CharacterLayer(hero.image,entry,room_dict['enemies']),
-                        "gui" : GUILayer()
+                        "gui" : GUILayer(hero.name)
                         }
         z = {
             "room" : 0,
@@ -459,7 +459,7 @@ class RoomLayer(cocos.tiles.RectMapLayer):
 
 class GUILayer(cocos.layer.Layer):
 
-    def __init__(self):
+    def __init__(self,name):
 
         cocos.layer.Layer.__init__(self)
 
@@ -500,6 +500,15 @@ class GUILayer(cocos.layer.Layer):
 
         self.__hero_life_bar = cocos.draw.Line(start=(x,y), end=(x+129,y), color=color, stroke_width=4)
         self.add(self.__hero_life_bar)
+
+        x = 475
+        y = 518
+
+        color = 150, 150, 150, 255
+
+        self.__hero_name = cocos.text.Label(text=name, position=(x,y),color=color)
+        self.add(self.__hero_name)
+
 
     def __getLifeBar(self,life,(x,y)):
 
