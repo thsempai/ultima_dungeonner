@@ -73,6 +73,7 @@ class Dungeon(list):
         CONTROLER.onKeyRelease('dungeon',symbol,modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
+
         self.__active_room.showTile((x,y))
 
 
@@ -322,12 +323,14 @@ class RoomScene(cocos.scene.Scene):
         tx,ty = int(x/TILE_SIZE[0]) - dx, int(y/TILE_SIZE[1]) - dy
         img =   { 
                 'image': None, 
-                'description' : '' 
+                'description' : '',
+                'type:' : 'none'
                 }
 
         if self.layer['character'].getHeroPosition() == (tx,ty):
             img['image'] = self.hero.image
             img['description'] = 'This is you...'
+            img['type'] = 'hero'
 
         else:
             sp = self.layer['character'].getEnemy((tx,ty))
@@ -335,6 +338,8 @@ class RoomScene(cocos.scene.Scene):
             if sp != None:
                 img['image'] = sp.image
                 img['description'] = str(sp).capitalize() + ':\n' + TEXTS['enemy'][str(sp)]
+                img['type'] = 'enemy'
+                img['life'] = sp.getLife()
 
             else:
                 sp = self.layer['gui'].getItem((x,y))
@@ -342,6 +347,7 @@ class RoomScene(cocos.scene.Scene):
                 if sp != None:
                     img['image'] = sp.image
                     img['description'] = str(sp).capitalize() + ':\n' + TEXTS['object'][str(sp)]
+                    img['type'] = 'item'
 
                 else:
                     sp = self.layer['item'].getItem((tx,ty))
@@ -349,6 +355,7 @@ class RoomScene(cocos.scene.Scene):
                     if sp != None:
                         img['image'] = sp.image
                         img['description'] = str(sp).capitalize() + ':\n' + TEXTS['object'][str(sp)]
+                        img['type'] = 'item'
 
         img['position'] = (tx,ty)
         self.layer['gui'].showImage(img)
@@ -478,7 +485,32 @@ class GUILayer(cocos.layer.Layer):
                         }
 
         self.__description = None
+        self.__life_bar = None
 
+    def __getLifeBar(self,life,(x,y)):
+
+        color = {
+                1 : (200,0,0,180),
+                2 : (200,200,0,180),
+                3 : (0,200,0,180)
+                }
+
+        pc = float(life[0])/life[1]
+
+        width = pc * TILE_SIZE[0]
+
+        index = int(pc*3)
+
+        if pc >= 0.66:
+            color = color[3]
+        elif pc >= 0.33:
+            color = color[2]
+        else:
+            color = color[1]
+
+        life_bar =  cocos.draw.Line((x+width,y),(x,y), color=color, stroke_width=3)
+
+        return life_bar
 
     def showImage(self,img):
 
@@ -489,6 +521,11 @@ class GUILayer(cocos.layer.Layer):
             if self.__show.has_key('sprite'):
                 self.__show['sprite'].kill()
                 self.__show = img
+
+                if self.__life_bar != None:
+                    self.__life_bar.kill()
+                    self.__life_bar = None
+
                 if self.__description != None:
                     self.__description.kill()
         
@@ -500,6 +537,13 @@ class GUILayer(cocos.layer.Layer):
                 t =  self.__show['description']
                 self.__description = cocos.text.RichLabel(text=t,position=(535,235),width=238,multiline=True)
                 self.add(self.__description)
+
+                if self.__show['type'] == 'enemy':
+                    pos = self.__show['position']
+                    pos = pos[0] * TILE_SIZE[0] + TILE_SIZE[0] , pos[1] * TILE_SIZE[1] + TILE_SIZE[1] + 45
+
+                    self.__life_bar = self.__getLifeBar(self.__show['life'],pos)
+                    self.add(self.__life_bar)
 
     def addMessage(self, message):
 
@@ -839,7 +883,10 @@ class Enemy(Sprite):
         self.thaco = 20
         self.ac = 20
         self.dr = 0
-        self.__hp = [1,1]
+        self.__hp = [10,10]
+
+    def getLife(self):
+        return self.__hp
 
     def hp():
        
