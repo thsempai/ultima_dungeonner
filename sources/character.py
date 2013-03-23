@@ -6,7 +6,7 @@ class InventoryFull(Exception):
         self.message = 'InventoryFull'
 
 
-class Hero:
+class Hero(object):
 
     def __init__(self,name):
 
@@ -16,7 +16,7 @@ class Hero:
         self.inventory = []
 
         self.__thaco = 20
-        self.__ac = 10
+        self.__ac = 15
         self.__dr = 0
         self.__hp = [10,10]
 
@@ -122,7 +122,7 @@ class Hero:
         #setter
         def fset(self, hp):
 
-            self.__hp[0] = min(self.__hp[0] + hp, self.__hp[1])
+            self.__hp[0] = min(hp, self.__hp[1])
         
         #deleter
         def fdel(self):

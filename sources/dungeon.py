@@ -606,7 +606,7 @@ class GUILayer(cocos.layer.Layer):
 
         x = 489
         y = 503
-        
+
         self.__hero_life_bar.kill()
         self.__hero_life_bar = cocos.draw.Line(start=(x,y), end=(x+width,y), color=color, stroke_width=4)
         self.add(self.__hero_life_bar)
