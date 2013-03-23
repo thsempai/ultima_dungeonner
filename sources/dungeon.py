@@ -308,6 +308,8 @@ class RoomScene(cocos.scene.Scene):
             if self.layer['room'].isTransition(h_pos):
                 self.__next()
 
+            self.layer['gui'].updateHeroLifeBar(self.hero.getLife())
+
         else:
             self.layer['gui'].removeLifeBar()
 
@@ -491,6 +493,14 @@ class GUILayer(cocos.layer.Layer):
         self.__description = None
         self.__life_bar = None
 
+        x = 489
+        y = 503 
+
+        color = (0,200,0,180)
+
+        self.__hero_life_bar = cocos.draw.Line(start=(x,y), end=(x+129,y), color=color, stroke_width=4)
+        self.add(self.__hero_life_bar)
+
     def __getLifeBar(self,life,(x,y)):
 
         color = {
@@ -521,7 +531,6 @@ class GUILayer(cocos.layer.Layer):
         if self.__life_bar != None:
             self.__life_bar.kill()
             self.__life_bar = None
-
 
     def showImage(self,img):
 
@@ -573,6 +582,34 @@ class GUILayer(cocos.layer.Layer):
         
         for index in range(min(5,len(self.__messages))):
             self.__labels[index].element.text = self.__messages[index]
+
+    def updateHeroLifeBar(self,life):
+
+        color = {
+                1 : (200,0,0,180),
+                2 : (200,200,0,180),
+                3 : (0,200,0,180)
+                }
+
+        pc = float(life[0])/life[1]
+
+        width = pc * 129
+
+        index = int(pc*3)
+
+        if pc >= 0.66:
+            color = color[3]
+        elif pc >= 0.33:
+            color = color[2]
+        else:
+            color = color[1]
+
+        x = 489
+        y = 503
+        
+        self.__hero_life_bar.kill()
+        self.__hero_life_bar = cocos.draw.Line(start=(x,y), end=(x+width,y), color=color, stroke_width=4)
+        self.add(self.__hero_life_bar)
 
     def refreshInventory(self,inventory):
 

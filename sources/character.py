@@ -24,6 +24,10 @@ class Hero:
 
         return self.name
 
+    def getLife(self):
+
+        return self.__hp
+
     def thaco():
        
         #doc
