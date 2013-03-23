@@ -307,6 +307,10 @@ class RoomScene(cocos.scene.Scene):
 
             if self.layer['room'].isTransition(h_pos):
                 self.__next()
+
+        else:
+            self.layer['gui'].removeLifeBar()
+
                 
     def __checkDeads(self):
 
@@ -511,6 +515,13 @@ class GUILayer(cocos.layer.Layer):
         life_bar =  cocos.draw.Line((x+width,y),(x,y), color=color, stroke_width=3)
 
         return life_bar
+
+    def removeLifeBar(self):
+
+        if self.__life_bar != None:
+            self.__life_bar.kill()
+            self.__life_bar = None
+
 
     def showImage(self,img):
 
