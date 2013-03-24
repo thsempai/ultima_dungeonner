@@ -61,6 +61,11 @@ class ServerConnection:
         return self.__main_directory + path
 
     @staticmethod
+    def getMainDirectory():
+        sc = ServerConnection()
+        return sc.__main_directory
+
+    @staticmethod
     def createDirectories():
 
         for path in DIR_LIST:
