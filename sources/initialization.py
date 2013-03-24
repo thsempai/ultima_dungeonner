@@ -1,17 +1,20 @@
 
 import cocos
+import pyglet
 
 from db_connection import DBConnection
 from server_connection import ServerConnection
 from dungeon import TILESETS, OBJECTS, ENEMIES, TEXTS, TILE_SIZE
+
+fonts = ['drakoheart.ttf']
 
 def init():
     ServerConnection.createDirectories()
     loadTileset()
     loadObjects()
     loadEnemies()
+    loadFonts()
     ServerConnection.getClientPath('img/gui/gui.png')
-
 
 
 def getTile(img,pos):
@@ -126,3 +129,13 @@ def loadEnemies():
 
     ENEMIES.update(dic)
     TEXTS['enemy'].update(text)
+
+def loadFonts():
+    main_directory = ServerConnection.getMainDirectory()
+
+    pyglet.resource.path.append(main_directory + '/fonts')
+    pyglet.resource.reindex()
+
+    for font in fonts:
+        ServerConnection.getClientPath('fonts/'+font)
+        pyglet.resource.add_font(font)

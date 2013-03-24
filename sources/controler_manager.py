@@ -15,7 +15,8 @@ class ControlerManager:
                                     'hero_right':       None,
                                     'hero_up'   :       None,
                                     'hero_down' :       None,
-                                    'grid_visibility' : None
+                                    'grid_visibility' : None,
+                                    'call_menu' :       None
                                     }
 
         self.__keys = {}
@@ -70,3 +71,4 @@ CONTROLER.mapCommand('dungeon','hero_down',pyglet.window.key.S)
 CONTROLER.mapCommand('dungeon','hero_left',pyglet.window.key.Q)
 CONTROLER.mapCommand('dungeon','hero_right',pyglet.window.key.D)
 CONTROLER.mapCommand('dungeon','grid_visibility',pyglet.window.key.G)
+CONTROLER.mapCommand('dungeon','call_menu',pyglet.window.key.F12)

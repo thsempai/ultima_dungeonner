@@ -8,6 +8,7 @@ from db_connection import DBConnection
 from server_connection import ServerConnection
 from controler_manager import CONTROLER
 from character import InventoryFull
+from menu import MainMenu
 
 TILESETS    = {}
 OBJECTS     = {}
@@ -48,6 +49,7 @@ class Dungeon(list):
         CONTROLER.defineCommand('dungeon','hero_left',room.moveHero,[(-1,0)])
         CONTROLER.defineCommand('dungeon','hero_right',room.moveHero,[(1,0)])
         CONTROLER.defineCommand('dungeon','grid_visibility',room.layer['grid'].switchVisibility)
+        CONTROLER.defineCommand('dungeon','call_menu',room.activeMenu)
 
     def changeRoom(self,index):
 
@@ -69,12 +71,22 @@ class Dungeon(list):
             self.__active_room.layer['gui'].refreshInventory(self.hero.inventory)
 
     def on_key_release(self,symbol, modifiers):
+        
+        if self.__active_room.on_pause:
+            return
 
         CONTROLER.onKeyRelease('dungeon',symbol,modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
 
+        if self.__active_room.on_pause:
+            return
+
         self.__active_room.showTile((x,y))
+
+    def getActiveRoom(self):
+
+        return self.__activeRoom
 
 
 class RoomScene(cocos.scene.Scene):
@@ -102,6 +114,13 @@ class RoomScene(cocos.scene.Scene):
 
         self.__next =  None
 
+        self.on_pause = False
+
+        commands =  [
+                    ('Continue',self.return_on_game,[]),
+                    ('Quit Game',self.quit,[])
+                    ]
+
         self.layer =    {
                         "room" : RoomLayer(room_dict['tileset'],self.size),
                         "item" : ItemLayer(room_dict['objects']),
@@ -119,6 +138,9 @@ class RoomScene(cocos.scene.Scene):
 
         for key, value in self.layer.items():
             self.add(value,z=z[key])
+
+        #couche non présente des le début
+        self.layer["menu"] = MainMenu(commands)
 
         self.addHero(hero)
 
@@ -185,6 +207,19 @@ class RoomScene(cocos.scene.Scene):
                     self.addEvent(event)
 
             self.__initEnemiesTurn()
+
+    def activeMenu(self):
+        self.add(self.layer['menu'],z=100)
+        self.on_pause = True
+
+    def return_on_game(self):
+        self.on_pause = False
+        self.remove(self.layer['menu'])
+
+    def quit(self):
+        self.on_pause = False
+        self.remove(self.layer['menu'])
+        cocos.director.director.pop()
 
     def __initEnemiesTurn(self):
 

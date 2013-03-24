@@ -122,7 +122,7 @@ class Hero(object):
         #setter
         def fset(self, hp):
 
-            self.__hp[0] = min(hp, self.__hp[1])
+            self.__hp[0] = max(0,min(hp, self.__hp[1]))
         
         #deleter
         def fdel(self):
