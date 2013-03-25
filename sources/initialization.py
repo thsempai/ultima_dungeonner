@@ -14,7 +14,13 @@ def init():
     loadObjects()
     loadEnemies()
     loadFonts()
+
+    main_directory = ServerConnection.getMainDirectory()
+    pyglet.resource.path.append(main_directory + '/bgm')
+    pyglet.resource.reindex()
+
     ServerConnection.getClientPath('img/gui/gui.png')
+    ServerConnection.getClientPath('bgm/main_screen.ogg')
 
 
 def getTile(img,pos):

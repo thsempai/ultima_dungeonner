@@ -17,6 +17,7 @@ DIR_LIST =  [
             '~/.udungeon/img/menu',
             '~/.udungeon/img/gui',
             '~/.udungeon/fonts',
+            '~/.udungeon/bgm'
             ]
 
 class ServerConnection:
@@ -87,4 +88,8 @@ class ServerConnection:
             return pyglet.image.load(ServerConnection.getClientPath(path))
         else:
             return pyglet.image.load(ServerConnection.getClientPath(path)).get_region(*region)
+
+    @staticmethod
+    def getMusic(path):
+        return pyglet.media.load(ServerConnection.getClientPath(path), streaming=False)
 
