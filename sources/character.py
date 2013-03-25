@@ -16,7 +16,7 @@ class Hero(object):
         self.inventory = []
 
         self.__thaco = 20
-        self.__ac = 15
+        self.__ac = 10
         self.__dr = 0
         self.__hp = [10,10]
 

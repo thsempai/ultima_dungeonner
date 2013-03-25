@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 import cocos
+import pyglet
 import getpass
 
 from dungeon import Dungeon, RoomScene
 from initialization import init
 from db_connection import DBConnection
+from server_connection import ServerConnection
 from user import User
 from menu import MainMenu, MENU_TRANSITION
 from credits import creditsScene
@@ -12,6 +14,7 @@ from ud_exception import UDungeonException
 
 SCREEN_SIZE = 800,600
 TITLE = "Ultima Dungeonner alpha v0.01"
+
 
 def play(scene):
     
@@ -50,6 +53,13 @@ def test():
         main_scene.add(label)
 
         main_scene.add(menu)
+
+        #music
+        bgm = ServerConnection.getMusic('bgm/main_screen.ogg')
+        bgm_player = pyglet.media.Player()
+        bgm_player.queue(bgm)
+        bgm_player.eos_action = bgm_player.EOS_LOOP
+        bgm_player.play()
 
         cocos.director.director.run(main_scene)
 
