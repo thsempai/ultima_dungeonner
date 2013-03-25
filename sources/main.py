@@ -7,6 +7,7 @@ from initialization import init
 from db_connection import DBConnection
 from user import User
 from menu import MainMenu, MENU_TRANSITION
+from credits import creditsScene
 from ud_exception import UDungeonException
 
 SCREEN_SIZE = 800,600
@@ -30,11 +31,14 @@ def test():
         dungeon = Dungeon(hero)
         game.push_handlers(dungeon)
         
+        credits_scene = creditsScene()
+
 
         #main scene
 
         main_command =  [
                         ('Play',play,[dungeon[0]]),
+                        ('Credits',play,[credits_scene]),
                         ('Quit',game.close,[])
                         ]
 
