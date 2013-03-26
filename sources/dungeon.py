@@ -27,8 +27,8 @@ class Dungeon(list):
     def __init__(self,hero):
         self.hero = hero
         #uniquement pour les tests
-        self.append(RoomScene(3,self.hero))
-        self.append(RoomScene(4,self.hero))
+        self.append(RoomScene(5,self.hero))
+        self.append(RoomScene(6,self.hero))
 
         self.__active_room = None
         self.__index = 0

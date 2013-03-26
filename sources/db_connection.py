@@ -8,7 +8,7 @@ from ud_exception import UDungeonException
 DB_SERVER = '1gamdb.gsmproductions.com'
 DB_USER = '1gamuser_dev'
 PASSWORD = '1gameamonth'
-SCHEMA = '1gam201302'
+SCHEMA = 'udungeon_dev'
 
 
 class DBConnection:
