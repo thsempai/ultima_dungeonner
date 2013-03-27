@@ -43,6 +43,7 @@ class Dungeon(list):
 
         room = self.__active_room
         self.__active_room.mapNext(self.nextRoom)
+        self.__active_room.mapQuitAction(self.reset)
 
         CONTROLER.defineCommand('dungeon','hero_up',room.moveHero,[(0,1)])
         CONTROLER.defineCommand('dungeon','hero_down',room.moveHero,[(0,-1)])
@@ -56,6 +57,16 @@ class Dungeon(list):
         self.__active_room = self[index]
         self.__index = index
         self.__mappingAction()
+
+    def reset(self):
+
+        for room in self:
+            for key,layer in room.layer.items():
+                if key != 'menu':
+                    room.remove(layer)
+            room.reset(self.hero)
+
+        self.changeRoom(0)
 
     def nextRoom(self):
 
@@ -95,16 +106,26 @@ class RoomScene(cocos.scene.Scene):
 
         cocos.scene.Scene.__init__(self)
 
+        self.room_dict = DBConnection.getRoom(room_id)
+
+        self.hero = None
+
+        self.reset(hero)
+
+        self.schedule(self.__callback)
+
+        self.__quit_action = None
+        self.__next = None
+
+
+    def reset(self,hero):
+
         dungeon_size = 13,13
         self.size = dungeon_size
 
         entry = int(self.size[0]/2),0
 
-        room_dict = DBConnection.getRoom(room_id)
-
-        self.hero = None
-
-        self.__name = room_dict['name']
+        self.__name = self.room_dict['name']
 
         self.__events_queue = []
 
@@ -122,10 +143,10 @@ class RoomScene(cocos.scene.Scene):
                     ]
 
         self.layer =    {
-                        "room" : RoomLayer(room_dict['tileset'],self.size),
-                        "item" : ItemLayer(room_dict['objects']),
+                        "room" : RoomLayer(self.room_dict['tileset'],self.size),
+                        "item" : ItemLayer(self.room_dict['objects']),
                         "grid" : GridLayer(TILE_SIZE,self.size),
-                        "character" : CharacterLayer(hero.image,entry,room_dict['enemies']),
+                        "character" : CharacterLayer(hero.image,entry,self.room_dict['enemies']),
                         "gui" : GUILayer(hero.name)
                         }
         z = {
@@ -142,11 +163,11 @@ class RoomScene(cocos.scene.Scene):
         #couche non présente des le début
         self.layer["menu"] = MainMenu(commands)
 
+        self.layer['grid'].visible = False
+
+        hero.inventory = []
         self.addHero(hero)
 
-        self.schedule(self.__callback)
-
-        self.layer['grid'].visible = False
 
     def addEvent(self,event):
 
@@ -163,6 +184,10 @@ class RoomScene(cocos.scene.Scene):
     def mapNext(self,fct):
 
         self.__next = fct
+
+    def mapQuitAction(self,action):
+
+        self.__quit_action = action
 
     def moveHero(self,move):
 
@@ -218,7 +243,8 @@ class RoomScene(cocos.scene.Scene):
 
     def quit(self):
         self.on_pause = False
-        self.remove(self.layer['menu'])
+        self.layer['menu'].kill()
+        self.__quit_action()
         cocos.director.director.pop()
 
     def __initEnemiesTurn(self):
