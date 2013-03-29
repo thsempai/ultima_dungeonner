@@ -5,10 +5,10 @@ import datetime
 
 from ud_exception import UDungeonException
 
-DB_SERVER = '1gamdb.gsmproductions.com'
+DB_SERVER = 'udungeonA.gsmproductions.com'
 DB_USER = '1gamuser_dev'
 PASSWORD = '1gameamonth'
-SCHEMA = 'udungeon_dev'
+SCHEMA = 'udungeon'
 
 
 class DBConnection:

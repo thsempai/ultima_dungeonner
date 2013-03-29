@@ -27,8 +27,8 @@ class Dungeon(list):
     def __init__(self,hero):
         self.hero = hero
         #uniquement pour les tests
-        self.append(RoomScene(5,self.hero))
-        self.append(RoomScene(6,self.hero))
+        self.append(RoomScene(4,self.hero))
+        self.append(RoomScene(3,self.hero))
 
         self.__active_room = None
         self.__index = 0
@@ -94,6 +94,13 @@ class Dungeon(list):
             return
 
         self.__active_room.showTile((x,y))
+
+    def on_mouse_press(self, x, y, button, modifiers):
+
+        if self.__active_room.on_pause:
+            return
+
+        self.__active_room.useItem((x,y))
 
     def getActiveRoom(self):
 
@@ -384,6 +391,14 @@ class RoomScene(cocos.scene.Scene):
                 self.layer['gui'].addMessage(msg)
                 self.layer['character'].kill(enemy)
 
+    def useItem(self, (x,y)):
+
+        index = self.layer['gui'].getItem((x,y),index=True)
+
+        if index != None:
+            self.hero.useItem(index)
+            self.layer['gui'].refreshInventory(self.hero.inventory)
+
     def showTile(self,(x,y)):
         
         dx,dy = 1,1
@@ -570,7 +585,6 @@ class GUILayer(cocos.layer.Layer):
         self.__hero_name = cocos.text.Label(text=name, position=(x,y),color=color)
         self.add(self.__hero_name)
 
-
     def __getLifeBar(self,life,(x,y)):
 
         color = {
@@ -640,11 +654,16 @@ class GUILayer(cocos.layer.Layer):
         self.__messages.insert(0,message)
         self.__updateLabel()
 
-    def getItem(self,(x,y)):
+    def getItem(self,(x,y),index=False):
 
+        ind = 0
         for item in self.__inventory:
             if item.get_rect().contains(x,y):
-                return item 
+                if index :
+                    return ind
+                else:
+                    return item 
+            ind += 1
 
         return None
 

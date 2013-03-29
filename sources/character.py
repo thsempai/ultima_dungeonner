@@ -1,6 +1,17 @@
 # -*- coding: utf-8 -*-
 from server_connection import ServerConnection
 
+
+## constants ##
+
+N_ITEM = 3
+
+ITEM_PROPERTY = {
+                'heal potion' : {
+                                'healing' : 20
+                                }
+                }
+
 class InventoryFull(Exception):
     def __init__(self):
         self.message = 'InventoryFull'
@@ -134,8 +145,29 @@ class Hero(object):
 
 
     def addItem(self,item):
-        if len(self.inventory) > 3:
+        if len(self.inventory) > N_ITEM:
             raise InventoryFull
         
         self.inventory.append(item)
+
+    def useItem(self, index):
+
+        if index >= N_ITEM:
+            return
+
+        item = self.inventory[index]
+        name = str(item)
+
+        prop = ITEM_PROPERTY[name]
+
+        for key,action in prop.items():
+            if key == 'healing':
+                self.hp += action
+
+        self.inventory.pop(index)
+
+
+
+
+
 
