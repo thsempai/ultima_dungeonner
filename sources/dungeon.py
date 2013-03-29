@@ -9,6 +9,7 @@ from server_connection import ServerConnection
 from controler_manager import CONTROLER
 from character import InventoryFull
 from menu import MainMenu
+from another_scene import gameoverScene, victoryScene
 
 TILESETS    = {}
 OBJECTS     = {}
@@ -81,6 +82,9 @@ class Dungeon(list):
             cocos.director.director.replace(room)
             self.__active_room.layer['gui'].refreshInventory(self.hero.inventory)
 
+        else:
+            print 'Trans' + str(self.__index)
+
     def on_key_release(self,symbol, modifiers):
         
         if self.__active_room.on_pause:
@@ -123,7 +127,6 @@ class RoomScene(cocos.scene.Scene):
 
         self.__quit_action = None
         self.__next = None
-
 
     def reset(self,hero):
 
@@ -174,7 +177,6 @@ class RoomScene(cocos.scene.Scene):
 
         hero.inventory = []
         self.addHero(hero)
-
 
     def addEvent(self,event):
 
@@ -378,10 +380,13 @@ class RoomScene(cocos.scene.Scene):
 
             self.layer['gui'].updateHeroLifeBar(self.hero.getLife())
 
+            if self.hero.hp <= 0:
+                print 'test'
+                self.gameOver()
+
         else:
             self.layer['gui'].removeLifeBar()
-
-                
+             
     def __checkDeads(self):
 
         for enemy in self.layer['character'].getEnemies().values():
@@ -441,6 +446,20 @@ class RoomScene(cocos.scene.Scene):
 
         img['position'] = (tx,ty)
         self.layer['gui'].showImage(img)
+
+    def gameOver(self):
+
+        self.__quit_action()
+        self.on_pause = False
+        cocos.director.director.replace(gameoverScene())
+
+    def victory(self):
+
+        self.__quit_action()
+        self.on_pause = False
+        cocos.director.director.replace(victoryScene())
+
+
  
 
 class RoomLayer(cocos.tiles.RectMapLayer):

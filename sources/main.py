@@ -9,7 +9,7 @@ from db_connection import DBConnection
 from server_connection import ServerConnection
 from user import User
 from menu import MainMenu, MENU_TRANSITION
-from credits import creditsScene
+from another_scene import creditsScene
 from ud_exception import UDungeonException
 
 SCREEN_SIZE = 800,600

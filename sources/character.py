@@ -29,7 +29,7 @@ class Hero(object):
         self.__thaco = 20
         self.__ac = 10
         self.__dr = 0
-        self.__hp = [10,10]
+        self.__hp = [100,100]
 
     def __repr__(self):
 
