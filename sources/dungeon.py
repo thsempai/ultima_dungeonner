@@ -22,14 +22,25 @@ TEXTS       =   {
 
 TILE_SIZE = 32,32
 
+TRAP_PROPERTY = {
+                'hole' :            {
+                                    'passable': False
+                                    },
+                'poisoned trap' :   {
+                                    'passable' : True,
+                                    'damage': 3
+                                    }
+                }
+
+
 
 class Dungeon(list):
 
     def __init__(self,hero):
         self.hero = hero
         #uniquement pour les tests
-        self.append(RoomScene(4,self.hero))
         self.append(RoomScene(3,self.hero))
+        self.append(RoomScene(4,self.hero))
 
         self.__active_room = None
         self.__index = 0
@@ -149,8 +160,8 @@ class RoomScene(cocos.scene.Scene):
         self.on_pause = False
 
         commands =  [
-                    ('Continue',self.return_on_game,[]),
-                    ('Quit Game',self.quit,[])
+                        ('Continue',self.return_on_game,[]),
+                        ('Quit Game',self.quit,[])
                     ]
 
         self.layer =    {
@@ -207,7 +218,9 @@ class RoomScene(cocos.scene.Scene):
         x,y =  self.layer['character'].getHeroPosition()
         x,y =  x +  move[0], y + move[1]
 
-        if self.layer['room'].isPassable((x,y)):
+        passable = self.layer['room'].isPassable((x,y)) and self.layer['item'].isPassable((x,y))
+
+        if passable:
 
             enemy =  self.layer['character'].getEnemy((x,y))
 
@@ -239,6 +252,17 @@ class RoomScene(cocos.scene.Scene):
                             'item': item,
                             'position': (x,y)
                             }
+
+                    self.addEvent(event)
+
+                elif item.type == 'trap':
+
+                    event = {
+                            'type': 'hero-walk-on-trap',
+                            'item': item,
+                            'position': (x,y)
+                            }
+                            
                     self.addEvent(event)
 
             self.__initEnemiesTurn()
@@ -328,7 +352,7 @@ class RoomScene(cocos.scene.Scene):
 
             elif event['type'] == 'hero-find-item':
 
-                msg = msg = str(self.hero) + ' finds ' + str(event['item']) + '.'
+                msg = str(self.hero) + ' finds ' + str(event['item']) + '.'
                 self.layer['gui'].addMessage(msg)
 
                 try:
@@ -339,6 +363,22 @@ class RoomScene(cocos.scene.Scene):
                 else:
                     self.layer['gui'].refreshInventory(self.hero.inventory)
                     self.layer['item'].removeItem(event['position'])
+
+            elif event['type'] == 'hero-walk-on-trap':
+
+                msg = str(self.hero) + ' walk on ' + str(event['item']) + '.'
+                self.layer['gui'].addMessage(msg)
+
+                trap_name = str(event['item'])
+
+                if TRAP_PROPERTY.has_key(trap_name):
+
+                    if TRAP_PROPERTY[trap_name].has_key('damage'):
+                        self.hero.hp -= TRAP_PROPERTY[trap_name]['damage']
+
+                    msg = trap_name.capitalize() + ' hurts ' + str(self.hero) + ' (' + str(TRAP_PROPERTY[trap_name]['damage']) +').'
+                    self.layer['gui'].addMessage(msg)
+
 
         self.__events_queue = []
 
@@ -792,6 +832,19 @@ class ItemLayer(cocos.layer.Layer):
         item = self.__obj_dict.pop(position)
         self.remove(item)
 
+    def isPassable(self,(x,y)):
+
+        item = self.getItem((x,y))
+
+        if item != None:
+            if TRAP_PROPERTY.has_key(str(item)):
+                prop = TRAP_PROPERTY[str(item)]
+
+                if prop.has_key('passable'):
+                    return prop['passable']
+
+        return True
+
 
 class CharacterLayer(cocos.layer.Layer):
 
@@ -826,7 +879,7 @@ class CharacterLayer(cocos.layer.Layer):
             for y in range(TILE_SIZE[1]):
                 n+=1
 
-                if n%3==0:
+                if n%6==0:
                     reg = (x,y,1,1)
                     speed = TILE_SIZE[0] * random.random(), TILE_SIZE[1] * random.random()
                     speed = speed[0] * [1,-1][random.randint(0,1)], speed[1] * [1,-1][random.randint(0,1)]
@@ -912,10 +965,12 @@ class CharacterLayer(cocos.layer.Layer):
         pot = []
 
         if dx != 0:
-            pot.append((dx,0))
+            if self.parent.layer['item'].isPassable((ex+dx,ex+0)):
+                pot.append((dx,0))
 
         if dy != 0:
-            pot.append((0,dy))
+            if self.parent.layer['item'].isPassable((ey+0,ey+dy)):
+                pot.append((0,dy))
 
         l = []
 
