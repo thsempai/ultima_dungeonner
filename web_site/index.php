@@ -1,8 +1,8 @@
 <?php
-    $server = '1gamdb.gsmproductions.com';
+    $server = 'udungeona.gsmproductions.com';
     $user = '1gamuser_dev';
     $password = '1gameamonth';
-    $schema = '1gam201302';
+    $schema = 'udungeon';
 
     $server = mysql_connect($server, $user, $password) or die('Erreur Connection DB');
     mysql_select_db($schema,$server);
