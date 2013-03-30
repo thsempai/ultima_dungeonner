@@ -43,4 +43,6 @@ nosetests.xml
 
 #mysql-workbench
 
-*.mwb.bak
+*.mwb.bak/sources/user_id.dat
+/docs/schema.mwb.bak
+/sources/user_id.dat
