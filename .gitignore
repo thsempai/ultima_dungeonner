@@ -33,3 +33,16 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# dia
+*.dia~
+
+#sublim text
+
+*.sublime-*
+
+#mysql-workbench
+
+*.mwb.bak/sources/user_id.dat
+/docs/schema.mwb.bak
+/sources/user_id.dat
