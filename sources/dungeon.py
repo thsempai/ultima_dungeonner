@@ -73,8 +73,9 @@ class Dungeon(list):
 
         self.__index += 1
         if len(self) > self.__index:
-            #changement à faire ici pour les games conditions
 
+            #changement à faire ici pour les games conditions
+            self.__active_room.layer['character'].removeHero()
             self.changeRoom(self.__index)
 
             room = cocos.scenes.transitions.SlideInTTransition(self.__active_room)
@@ -83,7 +84,7 @@ class Dungeon(list):
             self.__active_room.layer['gui'].refreshInventory(self.hero.inventory)
 
         else:
-            print 'Trans' + str(self.__index)
+            self.__active_room.victory()
 
     def on_key_release(self,symbol, modifiers):
         
@@ -459,8 +460,6 @@ class RoomScene(cocos.scene.Scene):
         self.on_pause = False
         cocos.director.director.replace(victoryScene())
 
-
- 
 
 class RoomLayer(cocos.tiles.RectMapLayer):
 
@@ -851,6 +850,11 @@ class CharacterLayer(cocos.layer.Layer):
     def getHeroPosition(self):
 
         return self.__hero_sprite.room_position
+
+    def removeHero(self):
+
+        self.__hero_sprite.room_position = 0,0
+        self.__hero_sprite.kill()
 
     def getEnemy(self, position):
 
