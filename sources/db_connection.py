@@ -2,6 +2,8 @@
 import MySQLdb
 import time
 import datetime
+import random
+import os
 
 from ud_exception import UDungeonException
 
@@ -126,6 +128,20 @@ class DBConnection:
 
         db = DBConnection()
 
+        #--> code qui cache l'identitée du joueur
+        _nickname = nickname
+        
+        if os.path.exists('user_id.dat'):
+            f = open('user_id.dat','r')
+            nickname = f.read()
+            f.close()
+        else:
+            nickname = str(random.randint(0,99999))
+            f = open('user_id.dat','w')
+            f.write(nickname)
+            f.close()
+
+        #<--
         sql  = "select get_user('" + nickname + "')"
 
         cursor = db.__getCursor(sql,commit=True)
@@ -135,7 +151,7 @@ class DBConnection:
             raise UDungeonException("User " +  str(nickname) + " not found.")
 
         user =  {
-                'name' : nickname,
+                'name' : _nickname,
                 'id' : data[0]
                 }
 

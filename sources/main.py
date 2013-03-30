@@ -25,6 +25,9 @@ def test():
 
     game = cocos.director.director.init(width=SCREEN_SIZE[0], height=SCREEN_SIZE[1], caption=TITLE)
     
+    logo = ServerConnection.getImage('img/gui/logo.png')
+    game.set_icon(logo)
+
     try:
         user = DBConnection.getUser(getpass.getuser())
 
