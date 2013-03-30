@@ -8,7 +8,7 @@ N_ITEM = 3
 
 ITEM_PROPERTY = {
                 'heal potion' : {
-                                'healing' : 20
+                                'healing' : 5
                                 }
                 }
 
@@ -29,7 +29,7 @@ class Hero(object):
         self.__thaco = 20
         self.__ac = 10
         self.__dr = 0
-        self.__hp = [100,100]
+        self.__hp = [20,20]
 
     def __repr__(self):
 

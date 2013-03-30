@@ -41,6 +41,8 @@ class Dungeon(list):
         #uniquement pour les tests
         self.append(RoomScene(3,self.hero))
         self.append(RoomScene(4,self.hero))
+        self.append(RoomScene(5,self.hero))
+
 
         self.__active_room = None
         self.__index = 0
@@ -97,7 +99,7 @@ class Dungeon(list):
         else:
             self.__active_room.victory()
 
-    def on_key_release(self,symbol, modifiers):
+    def on_key_press(self,symbol, modifiers):
         
         if self.__active_room.on_pause:
             return
@@ -1098,7 +1100,7 @@ class Enemy(Sprite):
         self.thaco = 20
         self.ac = 20
         self.dr = 0
-        self.__hp = [10,10]
+        self.__hp = [5,5]
 
     def getLife(self):
         return self.__hp
