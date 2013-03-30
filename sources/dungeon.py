@@ -72,10 +72,10 @@ class Dungeon(list):
     def nextRoom(self):
 
         self.__index += 1
+        self.__active_room.layer['character'].removeHero()
         if len(self) > self.__index:
 
             #changement à faire ici pour les games conditions
-            self.__active_room.layer['character'].removeHero()
             self.changeRoom(self.__index)
 
             room = cocos.scenes.transitions.SlideInTTransition(self.__active_room)

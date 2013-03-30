@@ -36,6 +36,8 @@ def gameoverScene():
     label = cocos.text.Label(text,position = (400,y), font_name = 'Drakoheart Leiend', font_size = 40, anchor_x = 'center')
     sc.add(label)
 
+    sc = cocos.scenes.transitions.ZoomTransition(sc)
+    
     return sc  
 
 def victoryScene():
@@ -46,6 +48,9 @@ def victoryScene():
 
     text = 'You''re out..'
     label = cocos.text.Label(text,position = (400,y), font_name = 'Drakoheart Leiend', font_size = 40, anchor_x = 'center')
+    
+    sc = cocos.scenes.transitions.ZoomTransition(sc)
+    
     sc.add(label)
 
     return sc  
