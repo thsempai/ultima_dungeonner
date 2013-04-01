@@ -12,8 +12,7 @@ from menu import MainMenu, MENU_TRANSITION
 from another_scene import creditsScene
 from ud_exception import UDungeonException
 
-SCREEN_SIZE = 800,600
-TITLE = "Ultima Dungeonner alpha v0.01"
+from data import SCREEN_SIZE, TITLE
 
 
 def play(scene):

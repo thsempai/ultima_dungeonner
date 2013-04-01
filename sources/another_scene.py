@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 import cocos
 
-CREDITS =   [
-            ('Game Design, code', ['Thomas Stassin']),
-            ('Graphics' , ['Thomas Stassin']),
-            ('Music' , ['Bastien Gorissen'])
-            ]
+from data import CREDITS
 
 def creditsScene():
 

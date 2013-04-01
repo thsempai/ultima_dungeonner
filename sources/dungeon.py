@@ -11,26 +11,8 @@ from character import InventoryFull
 from menu import MainMenu
 from another_scene import gameoverScene, victoryScene
 
-TILESETS    = {}
-OBJECTS     = {}
-ENEMIES     = {}
-
-TEXTS       =   {
-                    'enemy'     : {},
-                    'object'    : {}
-                }
-
-TILE_SIZE = 32,32
-
-TRAP_PROPERTY = {
-                'hole' :            {
-                                    'passable': False
-                                    },
-                'poisoned trap' :   {
-                                    'passable' : True,
-                                    'damage': 3
-                                    }
-                }
+#import data
+from data import TILESETS, OBJECTS, ENEMIES, TEXTS,TILE_SIZE, TRAP_PROPERTY
 
 
 

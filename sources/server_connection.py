@@ -8,17 +8,7 @@ import datetime
 
 from db_connection import DBConnection
 
-SERVER = 'http://sempai.gsmproductions.com/'
-
-DIR_LIST =  [
-            '~/.udungeon',
-            '~/.udungeon/img',
-            '~/.udungeon/img/tileset',
-            '~/.udungeon/img/menu',
-            '~/.udungeon/img/gui',
-            '~/.udungeon/fonts',
-            '~/.udungeon/bgm'
-            ]
+from data import DIR_LIST, SERVER
 
 class ServerConnection:
 
