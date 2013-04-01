@@ -4,7 +4,8 @@ import pyglet
 
 from db_connection import DBConnection
 from server_connection import ServerConnection
-from dungeon import TILESETS, OBJECTS, ENEMIES, TEXTS, TILE_SIZE
+
+from data import TILESETS, OBJECTS, ENEMIES, TEXTS, TILE_SIZE
 
 fonts = ['drakoheart.ttf']
 

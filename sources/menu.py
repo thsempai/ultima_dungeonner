@@ -2,7 +2,7 @@
 
 import cocos
 
-MENU_TRANSITION = cocos.scenes.transitions.ZoomTransition
+from data import MENU_TRANSITION
 
 class MainMenu(cocos.menu.Menu):
 

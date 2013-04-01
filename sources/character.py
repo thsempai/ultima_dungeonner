@@ -3,14 +3,8 @@ from server_connection import ServerConnection
 
 
 ## constants ##
+from data import N_ITEM, ITEM_PROPERTY
 
-N_ITEM = 3
-
-ITEM_PROPERTY = {
-                'heal potion' : {
-                                'healing' : 5
-                                }
-                }
 
 class InventoryFull(Exception):
     def __init__(self):
