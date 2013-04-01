@@ -1,27 +1,134 @@
 
 import cocos
 import pyglet
+import getpass
 
 from db_connection import DBConnection
 from server_connection import ServerConnection
 
 from data import TILESETS, OBJECTS, ENEMIES, TEXTS, TILE_SIZE
 
+from dungeon import Dungeon, RoomScene
+from db_connection import DBConnection
+from server_connection import ServerConnection
+from user import User
+from menu import MainMenu, MENU_TRANSITION
+from another_scene import creditsScene
+from ud_exception import UDungeonException
+
+from data import SCREEN_SIZE, TITLE
+
 fonts = ['drakoheart.ttf']
 
+def play(scene):
+    
+    scene = MENU_TRANSITION(scene)
+    cocos.director.director.push(scene)
+
+class InitLayer(cocos.scene.Scene):
+
+    def __init__(self,w_game):
+
+        cocos.scene.Scene.__init__(self)
+
+        text = 'Loading ... 0%'
+
+        self.label = cocos.text.Label(text,position = (400,300), font_name = 'Drakoheart Leiend', font_size = 40, anchor_x = 'center')
+        self.add(self.label)
+        self.schedule(self.__callback)
+        self.loading = init()
+        self.__time = 2.
+        self.w_game = w_game
+
+    def getMain(self):
+
+        user = DBConnection.getUser(getpass.getuser())
+
+        user = User(user)
+        hero = user.getHero()
+
+        dungeon = Dungeon(hero)
+        self.w_game.push_handlers(dungeon)
+        
+        credits_scene = creditsScene()
+
+
+        #main scene
+
+        main_command =  [
+                        ('Play',play,[dungeon[0]]),
+                        ('Credits',play,[credits_scene]),
+                        ('Quit',self.w_game.close,[])
+                        ]
+
+        main_scene =  cocos.scene.Scene()
+        menu =  MainMenu(main_command)
+
+        #Title
+        label = cocos.text.Label(TITLE,position = (400,500), font_name = 'Drakoheart Leiend', font_size = 45, anchor_x = 'center')
+        main_scene.add(label)
+
+        main_scene.add(menu)
+
+        #music
+        bgm = ServerConnection.getMusic('bgm/main_screen.ogg')
+        bgm_player = pyglet.media.Player()
+        bgm_player.queue(bgm)
+        bgm_player.eos_action = bgm_player.EOS_LOOP
+        bgm_player.play()
+
+        return main_scene
+       
+
+    def __callback(self,dt):
+
+        try:
+            if self.loading == None:
+                self.__time -= dt
+                if self.__time <= 0.:
+                    main_scene = self.getMain()
+                    cocos.director.director.replace(main_scene)
+                    return
+                else:
+                    return
+
+            pc = self.loading.next()
+            self.label.element.text = 'Loading ... ' + str(int(pc*100)) + '%'
+
+        except StopIteration as e:
+            self.loading = None
+
 def init():
+
+
+    def step(s):
+        n_step = 7.
+        pc =s/n_step
+        return round(pc,2)
+    
     ServerConnection.createDirectories()
+    yield step(1)
+
     loadTileset()
+    yield step(2)
+
     loadObjects()
+    yield step(3)
+
     loadEnemies()
+    yield step(4)
+
     loadFonts()
+    yield step(5)
 
     main_directory = ServerConnection.getMainDirectory()
     pyglet.resource.path.append(main_directory + '/bgm')
     pyglet.resource.reindex()
+    yield step(6)
 
     ServerConnection.getClientPath('img/gui/gui.png')
     ServerConnection.getClientPath('bgm/main_screen.ogg')
+    yield step(7)
 
 
 def getTile(img,pos):
