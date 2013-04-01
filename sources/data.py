@@ -22,7 +22,7 @@ SERVER = 'http://sempai.gsmproductions.com/'
 DB_SERVER = 'udungeonA.gsmproductions.com'
 DB_USER = '1gamuser_dev'
 PASSWORD = '1gameamonth'
-SCHEMA = 'udungeon'
+SCHEMA = 'udungeond'
 
 #Dungeon
 TILESETS    = {}
