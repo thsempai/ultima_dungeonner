@@ -4,7 +4,7 @@ import cocos.scenes
 
 # donnée générale
 SCREEN_SIZE = 800,600
-TITLE = "Ultima Dungeonner alpha v0.02"
+TITLE = "Ultima Dungeonner alpha v0.01.1"
 
 CREDITS =   [
             ('Game Design, code', ['Thomas Stassin']),
