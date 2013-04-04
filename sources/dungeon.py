@@ -19,22 +19,25 @@ from data import TILESETS, OBJECTS, ENEMIES, TEXTS,TILE_SIZE, TRAP_PROPERTY
 
 class Dungeon(list):
 
-    def __init__(self,hero):
+    def __init__(self,hero,load=None):
         self.hero = hero
-        #uniquement pour les tests
-        self.append(RoomScene(3,self.hero))
-        self.append(RoomScene(4,self.hero))
-        self.append(RoomScene(5,self.hero))
-
-
         self.__active_room = None
         self.__index = 0
 
+        if load == None:
+            l_room = DBConnection.getDungeon()
+            for room_id in l_room:
+                self.addRoom(room_id)
+
         self.changeRoom(0)
+
 
     def __repr__(self):
 
         return "Class Dungeon"
+
+    def addRoom(self, room_id):
+        self.append(RoomScene(room_id,self.hero))
 
     def __mappingAction(self):
 
