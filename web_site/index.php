@@ -1,95 +1,63 @@
 <?php
-    $server = 'udungeona.gsmproductions.com';
-    $user = '1gamuser_dev';
-    $password = '1gameamonth';
-    $schema = 'udungeon';
-
-    $server = mysql_connect($server, $user, $password) or die('Erreur Connection DB');
-    mysql_select_db($schema,$server);
+    include('header.php');
 
     $sql =  "select das_data ";
     $sql .= "from data_site ";
     $sql .= "where das_field = 'version'";
 
-    $version = 'v?.??';
+    $_SESSION['version'] = 'v?.??';
 
     $result = mysql_query($sql);
     if ($row = mysql_fetch_array($result))
         {
-        $version = $row[0]; 
+        $_SESSION['version'] = $row[0]; 
         }
 
     $sql =  "select das_data ";
     $sql .= "from data_site ";
     $sql .= "where das_field = 'release date'";
 
-    $release_date = '??/??/????';
+    $_SESSION['release_date'] = '??/??/????';
     
     $result = mysql_query($sql);
     if ($row = mysql_fetch_array($result))
         {
-        $release_date = $row[0]; 
+        $_SESSION['release_date'] = $row[0]; 
         }
+
+    if(isset($_GET['page']))
+        $_SESSION['page']=$_GET['page'];
+    else 
+        $_SESSION['page']='home'; 
 ?>
 
 <html>
     <head>
-        <title>Ultima Dungeonner <?php echo $version; ?></title>
+        <title><?php echo $TITLE . ' ' . $_SESSION['version']; ?></title>
         <link href="img/gui/logo.png" rel="icon"/>
         <link rel="stylesheet" href="udungeon.css"/>
     </head>
     <body>
 
         <h1>
-            Utilma Dungeonner <?php echo $version; ?>
+            <?php echo $TITLE . ' ' . $_SESSION['version']; ?>
         </h1>
-
-        <div class="screenshot">
-            <img src="screenshots/image.png" alt="Ultima dungeonner">
+        <?php
+            include('topbar.php');
         
-            
-            <div class="date_release">
-                Next release date : <?php echo $release_date; ?>
-            </div>
-        </div>
-        <div class="dwl">
-            <h2>
-                Download
-            </h2>
-            <div class="dwl_row">
-                <div class="dwl_box_type">
-                    Sources
-                </div>
-                <div class="dwl_box_file">
-                    <a href="https://github.com/thsempai/ultima_dungeonner/archive/alpha_v0.01.zip">
-                        alpha_v0.01.zip
-                    </a>
-                </div>
-            </div>
-            <div class="dwl_row">
-                <div class="dwl_box_type">
-                    Linux
-                </div>
-                <div class="dwl_box_file">
-                    coming soon...
-                </div>
-            </div>
-            <div class="dwl_row">
-                <div class="dwl_box_type">
-                    Mac-os
-                </div>
-                <div class="dwl_box_file">
-                    coming soon...
-                </div>
-            </div>
-            <div class="dwl_row">
-                <div class="dwl_box_type">
-                    Windows
-                </div>
-                <div class="dwl_box_file">
-                    coming soon...
-                </div>
-            </div>
-        </div>
+
+        switch($_SESSION['page'])
+            {
+            case 'home':        include('home.php');
+                                break;
+            case 'download':    include('download.php');
+                                break;
+
+            case 'music':       include('music.php');
+                                break;
+            default:            include('home.php');
+            }
+        ?>
+
     </body>
 </html>
