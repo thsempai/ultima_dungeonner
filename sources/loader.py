@@ -30,4 +30,5 @@ class LoaderScene(cocos.scene.Scene):
                 result = self.generator.next()
                 self.label.element.text = 'Loading ... ' + str(int(result*100)) + '%'
             except StopIteration as e:
-                cocos.director.director.replace(self.next())
+                next = self.next()
+                cocos.director.director.replace(next)
