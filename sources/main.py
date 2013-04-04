@@ -33,7 +33,7 @@ class MainScene(cocos.scene.Scene):
         hero = user.getHero()
 
         dungeon = Dungeon(hero)
-        cocos.director.director.push_handlers(dungeon)
+        cocos.director.director.window.push_handlers(dungeon)
         
         credits_scene = creditsScene()
 
