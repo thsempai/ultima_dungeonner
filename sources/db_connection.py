@@ -63,6 +63,7 @@ class DBConnection:
 
         return data
 
+
     @staticmethod
     def getRoom(room_id):
 
@@ -154,3 +155,29 @@ class DBConnection:
                 }
 
         return user
+
+
+    @staticmethod
+    def getDungeon():
+        db = DBConnection()
+
+        sql  = 'select roo_id '
+        sql += 'from room '
+
+        print sql
+        cursor = db.__getCursor(sql)
+        data = list(cursor.fetchall())
+
+        l_room = []
+
+        while len(l_room) < 3 and len(data) > 0:
+            n = random.randint(0,len(data)-1)
+            l_room.append(data.pop(n)[0])
+
+        return l_room
+
+
+
+
+
+
