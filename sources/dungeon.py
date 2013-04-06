@@ -11,6 +11,7 @@ from character import InventoryFull
 from menu import MainMenu
 from another_scene import gameoverScene, victoryScene
 from sprite import Sprite, Enemy, Particle
+from translation import getTranslation
 
 #import data
 from data import TILESETS, OBJECTS, ENEMIES, TEXTS,TILE_SIZE, TRAP_PROPERTY
@@ -221,7 +222,7 @@ class RoomScene(cocos.scene.Scene):
 
                 self.addEvent(event)
 
-                msg = str(self.hero) + ' attacks ' + str(event['target']) + '.'
+                msg = getTranslation('ATTACKS',self.hero,event['target'])
                 self.layer['gui'].addMessage(msg)
 
                 self.layer['character'].heroAttack(move)
@@ -294,17 +295,17 @@ class RoomScene(cocos.scene.Scene):
 
                             event['target'].hp -= dgt
 
-                            msg = str(self.hero).capitalize() + ' hurts ' + str(event['target']).capitalize() + ' (' + str(dgt) +').'
+                            msg = getTranslation('HURTS',str(self.hero).capitalize(),str(event['target']).capitalize(),str(dgt))
                             self.layer['gui'].addMessage(msg)
 
                         else:
 
-                            msg = str(event['target']).capitalize() + ' blocks ' + str(self.hero).capitalize() + ' attack.'
+                            msg = getTranslation('BLOCKS',str(event['target']).capitalize(),str(self.hero).capitalize())
                             self.layer['gui'].addMessage(msg)
 
                     else:
 
-                        msg = str(event['target']).capitalize() + ' dodges ' + str(self.hero).capitalize() + ' attack.'
+                        msg = etTranslation('DODGES',str(event['target']).capitalize(),str(self.hero).capitalize())
                         self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'enemy-attack':
@@ -325,28 +326,28 @@ class RoomScene(cocos.scene.Scene):
 
                             self.hero.hp -= dgt
 
-                            msg = str(event['from']) + ' hurts ' + str(self.hero) + ' (' + str(dgt) +').'
+                            msg = getTranslation('HURTS',str(event['from']).capitalize(),self.hero,dgt)
                             self.layer['gui'].addMessage(msg)
 
                         else:
 
-                            msg = str(self.hero) + ' blocks ' + str(event['from']) + ' attack.'
+                            msg = getTranslation('BLOCKS',self.hero,str(event['from']).capitalize())
                             self.layer['gui'].addMessage(msg)
 
                     else:
 
-                        msg = str(self.hero) + ' dodges ' + str(event['from']) + ' attack.'
+                        msg = getTranslation('DODGES',self.hero,str(event['from']).capitalize())
                         self.layer['gui'].addMessage(msg)
 
             elif event['type'] == 'hero-find-item':
 
-                msg = str(self.hero) + ' finds ' + str(event['item']) + '.'
+                msg = getTranslation('FINDS',self.hero,event['item'])
                 self.layer['gui'].addMessage(msg)
 
                 try:
                     self.hero.addItem(event['item'])
                 except InventoryFull:
-                    msg = 'The inventory is full.'
+                    msg = getTranslation('INVENTORY-FULL')
                     self.layer['gui'].addMessage(msg)
                 else:
                     self.layer['gui'].refreshInventory(self.hero.inventory)
@@ -364,7 +365,7 @@ class RoomScene(cocos.scene.Scene):
                     if TRAP_PROPERTY[trap_name].has_key('damage'):
                         self.hero.hp -= TRAP_PROPERTY[trap_name]['damage']
 
-                    msg = trap_name.capitalize() + ' hurts ' + str(self.hero) + ' (' + str(TRAP_PROPERTY[trap_name]['damage']) +').'
+                    msg = getTranslation('HURTS',trap_name.capitalize(),self.hero,TRAP_PROPERTY[trap_name]['damage'])
                     self.layer['gui'].addMessage(msg)
 
 
@@ -390,7 +391,7 @@ class RoomScene(cocos.scene.Scene):
                     if event != None:
                         if event['type'] == 'enemy-attack':
                             
-                            msg = str(event['from']).capitalize() + ' attacks ' + str(self.hero) + '.'
+                            msg = getTranslation('ATTACKS',str(event['from']).capitalize(),self.hero)
 
                             self.layer['gui'].addMessage(msg)
                             self.addEvent(event)
@@ -410,7 +411,6 @@ class RoomScene(cocos.scene.Scene):
             self.layer['gui'].updateHeroLifeBar(self.hero.getLife())
 
             if self.hero.hp <= 0:
-                print 'test'
                 self.gameOver()
 
         else:
@@ -421,7 +421,7 @@ class RoomScene(cocos.scene.Scene):
         for enemy in self.layer['character'].getEnemies().values():
 
             if enemy.hp <= 0:
-                msg = str(enemy).capitalize() + ' dies.'
+                msg = getTranslation('DIE',str(enemy).capitalize())
                 self.layer['gui'].addMessage(msg)
                 self.layer['character'].kill(enemy)
 
@@ -445,7 +445,7 @@ class RoomScene(cocos.scene.Scene):
 
         if self.layer['character'].getHeroPosition() == (tx,ty):
             img['image'] = self.hero.image
-            img['description'] = 'This is you...'
+            img['description'] = getTranslation('YOU')
             img['type'] = 'hero'
 
         else:

@@ -1,0 +1,11 @@
+translation	translation-module.html
+translation.setLanguage	translation-module.html#setLanguage
+translation.currentLanguage	translation-module.html#currentLanguage
+translation.GDictTranslation	translation-module.html#GDictTranslation
+translation.getLanguages	translation-module.html#getLanguages
+translation.GLng	translation-module.html#GLng
+translation.__package__	translation-module.html#__package__
+translation.loadTranslation	translation-module.html#loadTranslation
+translation.getTranslation	translation-module.html#getTranslation
+translation.checkTranslation	translation-module.html#checkTranslation
+translation.isLanguage	translation-module.html#isLanguage
