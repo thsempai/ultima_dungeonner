@@ -1,0 +1,33 @@
+#CODE; LNG;TEXT
+ATTACKS;EN;#1 attacks #2
+ATTACKS;FR;#1 attaque #2
+DIE;EN;#1 dies
+DIE;FR;#1 meurt
+HURTS;EN;#1 hurts #2 (#3)
+HURTS;FR;#1 blesse #2 (#3)
+BLOCKS;EN;#1 blocks #2 attack
+BLOCKS;FR;#1 bloque l'attaque de #2
+DODGES;EN;#1 dodges #2 attack
+DODGES;FR;#1 évite l'attaque de #2
+FINDS;EN;#1 finds #2
+FINDS;EN;#1 trouve #2
+INVENTORY-FULL;EN;The inventory is full.
+INVENTORY-FULL;FR;
+YOU;EN;This is you...
+YOU;EN;C'est vous...
+GAME-DESIGN;EN;Game Design, Code
+GAME-DESIGN;FR;Game Design, Code
+GRAPHICS;EN;Graphics
+GRAPHICS;FR;Graphiques
+MUSIC;EN;Music
+MUSIC;FR;Musique
+VICTORY;EN;You're out..
+VICTORY;FR;Vous êtes sorti...
+FAIL;FR;Vous êtes mort...
+FAIL;EN;You are dead...
+PLAY;EN;Play
+PLAY;FR;Jouer
+QUIT;FR;Quitter
+QUIT;EN;Quit
+CREDITS;FR;Crédits
+CREDITS;EN;Credits
