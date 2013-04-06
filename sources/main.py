@@ -18,8 +18,10 @@ from menu import MainMenu, MENU_TRANSITION
 from another_scene import creditsScene
 from loader import LoaderScene
 from ud_exception import UDungeonException
+from translation import getTranslation
 
 from data import SCREEN_SIZE, TITLE
+
 
 class MainScene(cocos.scene.Scene):
 
@@ -41,9 +43,9 @@ class MainScene(cocos.scene.Scene):
         #main scene
 
         main_command =  [
-                        ('Play',play,[dungeon[0]]),
-                        ('Credits',play,[credits_scene]),
-                        ('Quit',cocos.director.director.window.close,[])
+                        (getTranslation('PLAY'),play,[dungeon[0]]),
+                        (getTranslation('CREDITS'),play,[credits_scene]),
+                        (getTranslation('QUIT'),cocos.director.director.window.close,[])
                         ]
 
         menu =  MainMenu(main_command)

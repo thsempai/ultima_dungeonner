@@ -164,7 +164,6 @@ class DBConnection:
         sql  = 'select roo_id '
         sql += 'from room '
 
-        print sql
         cursor = db.__getCursor(sql)
         data = list(cursor.fetchall())
 

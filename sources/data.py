@@ -2,14 +2,15 @@
 import cocos
 import cocos.scenes
 
+
 # donnée générale
 SCREEN_SIZE = 800,600
 TITLE = "Ultima Dungeonner alpha v0.01.1"
 
 CREDITS =   [
-            ('Game Design, code', ['Thomas Stassin']),
-            ('Graphics' , ['Thomas Stassin']),
-            ('Music' , ['Bastien Gorissen'])
+            ('GAME-DESIGN', ['Thomas Stassin']),
+            ('GRAPHICS', ['Thomas Stassin']),
+            ('MUSIC', ['Bastien Gorissen'])
             ]
 
 #transition
@@ -63,5 +64,6 @@ DIR_LIST =  [
             '~/.udungeon/img/menu',
             '~/.udungeon/img/gui',
             '~/.udungeon/fonts',
-            '~/.udungeon/bgm'
+            '~/.udungeon/bgm',
+            '~/.udungeon/translation'
             ]

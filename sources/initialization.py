@@ -3,8 +3,8 @@ import pyglet
 
 from server_connection import ServerConnection
 from db_connection import DBConnection
-from data import TILE_SIZE, TILESETS, OBJECTS, TEXTS, ENEMIES
-
+from data import TILE_SIZE, TILESETS, OBJECTS, TEXTS, ENEMIES, CREDITS
+from translation import loadTranslation, setLanguage, getTranslation
 fonts = ['drakoheart.ttf']
 
 
@@ -12,7 +12,7 @@ def init():
 
 
     def step(s):
-        n_step = 7.
+        n_step = 10.
         pc =s/n_step
         return round(pc,2)
     
@@ -39,6 +39,26 @@ def init():
     ServerConnection.getClientPath('img/gui/gui.png')
     ServerConnection.getClientPath('bgm/main_screen.ogg')
     yield step(7)
+
+    tra_path = ServerConnection.getClientPath('translation/translate.tra')
+    yield step(8)
+
+
+    loadTranslation(tra_path)
+    setLanguage('FR')
+    yield step(9)
+
+    global CREDITS
+
+    for index in range(len(CREDITS)):
+        CREDITS[index]= (getTranslation(CREDITS[index][0]),CREDITS[index][1])
+
+    yield step(10)
+
+
+    #chargement des credits
+
+
 
 
 def getTile(img,pos):

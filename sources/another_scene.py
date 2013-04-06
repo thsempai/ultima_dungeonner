@@ -2,6 +2,7 @@
 import cocos
 
 from data import CREDITS
+from translation import getTranslation
 
 def creditsScene():
 
@@ -28,7 +29,7 @@ def gameoverScene():
 
     y = 300
 
-    text = 'You are dead...'
+    text = getTranslation('FAIL')
     label = cocos.text.Label(text,position = (400,y), font_name = 'Drakoheart Leiend', font_size = 40, anchor_x = 'center')
     sc.add(label)
 
@@ -42,7 +43,7 @@ def victoryScene():
 
     y = 300
 
-    text = 'You''re out..'
+    text = getTranslation('VICTORY')
     label = cocos.text.Label(text,position = (400,y), font_name = 'Drakoheart Leiend', font_size = 40, anchor_x = 'center')
     
     sc = cocos.scenes.transitions.ZoomTransition(sc)
