@@ -158,7 +158,7 @@ class DBConnection:
 
 
     @staticmethod
-    def getDungeon():
+    def getDungeon(n):
         db = DBConnection()
 
         sql  = 'select roo_id '
@@ -169,7 +169,7 @@ class DBConnection:
 
         l_room = []
 
-        while len(l_room) < 3 and len(data) > 0:
+        while len(l_room) < n and len(data) > 0:
             n = random.randint(0,len(data)-1)
             l_room.append(data.pop(n)[0])
 

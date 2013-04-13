@@ -10,7 +10,7 @@ from server_connection import ServerConnection
 
 from data import TILESETS, OBJECTS, ENEMIES, TEXTS, TILE_SIZE
 
-from dungeon import Dungeon, RoomScene
+from dungeon import Dungeon, Room
 from db_connection import DBConnection
 from server_connection import ServerConnection
 from user import User
@@ -43,7 +43,7 @@ class MainScene(cocos.scene.Scene):
         #main scene
 
         main_command =  [
-                        (getTranslation('PLAY'),play,[dungeon[0]]),
+                        (getTranslation('PLAY'),play,[dungeon.rooms[0]]),
                         (getTranslation('CREDITS'),play,[credits_scene]),
                         (getTranslation('QUIT'),cocos.director.director.window.close,[])
                         ]
