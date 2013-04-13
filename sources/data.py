@@ -35,7 +35,7 @@ TEXTS       =   {
                     'object'    : {}
                 }
 
-TILE_SIZE = 64,64
+TILE_SIZE = 32,32
 DUNGEON_SIZE = 13,13
 
 TRAP_PROPERTY = {

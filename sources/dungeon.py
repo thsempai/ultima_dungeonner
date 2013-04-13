@@ -8,10 +8,6 @@ import random
 from data import TILESETS, DUNGEON_SIZE,TILE_SIZE
 from db_connection import DBConnection
 
-# -- CONSTANTE TECHNIQUE --
-
-N_TILE = 12
-
 
 class Dungeon:
 
@@ -57,7 +53,8 @@ class RoomLayer(cocos.tiles.RectMapLayer):
         self.__applyTiles()
 
         cocos.tiles.RectMapLayer.__init__(self,'room',self.size[0],self.size[1],self.cells)
-        self.set_view(0,0,N_TILE*8,N_TILE*8)  
+        self.set_view(0,0,200,200)
+
 
     def __build(self):
         self.cells = []
