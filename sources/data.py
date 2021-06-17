@@ -35,7 +35,7 @@ TEXTS       =   {
                     'object'    : {}
                 }
 
-TILE_SIZE = 64,64
+TILE_SIZE = 128, 128
 
 TRAP_PROPERTY = {
                 'hole' :            {
