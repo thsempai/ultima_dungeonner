@@ -65,5 +65,5 @@ DIR_LIST =  [
             '~/.udungeon/img/gui',
             '~/.udungeon/fonts',
             '~/.udungeon/bgm',
-            '~/.udungeon/translation'
+            '~/.udungeon/traduction'
             ]
