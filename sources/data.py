@@ -35,7 +35,7 @@ TEXTS       =   {
                     'object'    : {}
                 }
 
-TILE_SIZE = 32,32
+TILE_SIZE = 64,64
 
 TRAP_PROPERTY = {
                 'hole' :            {
@@ -54,7 +54,7 @@ ITEM_PROPERTY = {
                 }
 
 #hero
-N_ITEM = 3
+N_ITEM = 4
 
 #data
 DIR_LIST =  [
