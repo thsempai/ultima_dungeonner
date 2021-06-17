@@ -17,7 +17,8 @@ insert into
         obj_til_xid,
         obj_til_x,
         obj_til_y,
-        obj_description
+        obj_description,
+	obj_test
         )
     values
         (
@@ -26,7 +27,8 @@ insert into
         @trap_tileset,
         0,
         0,
-        'It is a impassable hole.'
+        'It is a impassable hole.',
+	'Test'
         );
 
 commit;
